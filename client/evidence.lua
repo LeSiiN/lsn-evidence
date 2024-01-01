@@ -126,6 +126,20 @@ end)
 AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
     local player = QBCore.Functions.GetPlayerData()
     PlayerJob = player.job
+    if GetResourceState('ox_inventory'):match("start") then
+        exports.ox_inventory:displayMetadata({
+            label = 'Label',
+            type = 'Type',
+            street = 'Street',
+            ammolabel = 'Ammo Label',
+            ammotype = 'Ammo Type',
+            serie = 'Serial',
+            dnalabel = 'DNA',
+            bloodtype = 'Blood Type',
+            fingerprint = 'Fingerprint',
+            rgb = '',
+        })
+    end
 end)
 
 RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
@@ -441,7 +455,7 @@ RegisterNetEvent('evidence:client:ClearScene', function()
     local blooddropList = {}
     local fingerprintList = {}
     local vehiclefragmentList = {}
-    QBCore.Functions.Progressbar('clear_scene', Lang:t('progressbar.crime_scene'), 5000, false, true, { 
+    QBCore.Functions.Progressbar('clear_scene', Lang:t('progressbar.crime_scene'), 5000, false, true, {
         disableMovement = false,
         disableCarMovement = false,
         disableMouse = false,
@@ -496,7 +510,7 @@ RegisterNetEvent('evidence:client:ClearScene', function()
             TriggerServerEvent('evidence:server:ClearVehicleFragements', vehiclefragmentList)
         end
         if Config.Notify == "qb" then
-            QBCore.Functions.Notify(Lang:t('success.crime_scene_removed'), 'success') 
+            QBCore.Functions.Notify(Lang:t('success.crime_scene_removed'), 'success')
         elseif Config.Notify == "ox" then
             lib.notify({ title = 'Evidence', description = Lang:t('success.crime_scene_removed'), duration = 5000, type = 'success' })
         else
@@ -504,7 +518,7 @@ RegisterNetEvent('evidence:client:ClearScene', function()
         end
     end, function() -- Cancel
         if Config.Notify == "qb" then
-            QBCore.Functions.Notify(Lang:t('error.scene_not_removed'), 'error') 
+            QBCore.Functions.Notify(Lang:t('error.scene_not_removed'), 'error')
         elseif Config.Notify == "ox" then
             lib.notify({ title = 'Evidence', description = Lang:t('error.scene_not_removed'), duration = 5000, type = 'error' })
         else
@@ -520,7 +534,7 @@ RegisterNetEvent('evidence:client:ClearSceneCrime', function()
     local blooddropList = {}
     local fingerprintList = {}
     local vehiclefragmentList = {}
-    QBCore.Functions.Progressbar('clear_scene', Lang:t('progressbar.crime_scene'), 3000, false, true, { 
+    QBCore.Functions.Progressbar('clear_scene', Lang:t('progressbar.crime_scene'), 3000, false, true, {
         disableMovement = false,
         disableCarMovement = false,
         disableMouse = false,
@@ -575,7 +589,7 @@ RegisterNetEvent('evidence:client:ClearSceneCrime', function()
             TriggerServerEvent('evidence:server:ClearVehicleFragements', vehiclefragmentList)
         end
         if Config.Notify == "qb" then
-            QBCore.Functions.Notify(Lang:t('success.crime_scene_removed'), 'success') 
+            QBCore.Functions.Notify(Lang:t('success.crime_scene_removed'), 'success')
         elseif Config.Notify == "ox" then
             lib.notify({ title = 'Evidence', description = Lang:t('success.crime_scene_removed'), duration = 5000, type = 'success' })
         else
@@ -583,7 +597,7 @@ RegisterNetEvent('evidence:client:ClearSceneCrime', function()
         end
     end, function() -- Cancel
         if Config.Notify == "qb" then
-            QBCore.Functions.Notify(Lang:t('error.scene_not_removed'), 'error') 
+            QBCore.Functions.Notify(Lang:t('error.scene_not_removed'), 'error')
         elseif Config.Notify == "ox" then
             lib.notify({ title = 'Evidence', description = Lang:t('error.scene_not_removed'), duration = 5000, type = 'error' })
         else
@@ -727,6 +741,16 @@ CreateThread(function()
                                             serie = Casings[CurrentCasing].serie
                                         }
                                         TriggerServerEvent('evidence:server:AddCasingToInventory', CurrentCasing, info)
+                                        if Config.Inventory == "ox" then
+                                            exports.ox_inventory:displayMetadata({
+                                                label = 'Label',
+                                                type = 'Type',
+                                                street = 'Street',
+                                                ammolabel = 'Ammo Label',
+                                                ammotype = 'Ammo Type',
+                                                serie = 'Serial'
+                                            })
+                                        end
                                     end
                                 end
                             end
@@ -760,6 +784,15 @@ CreateThread(function()
                                             bloodtype = Blooddrops[CurrentBlooddrop].bloodtype
                                         }
                                         TriggerServerEvent('evidence:server:AddBlooddropToInventory', CurrentBlooddrop, info)
+                                        if Config.Inventory == "ox" then
+                                            exports.ox_inventory:displayMetadata({
+                                                label = 'Label',
+                                                type = 'Type',
+                                                street = 'Street',
+                                                dnalabel = 'DNA',
+                                                bloodtype = 'Blood Type'
+                                            })
+                                        end
                                     end
                                 end
                             end
@@ -792,6 +825,14 @@ CreateThread(function()
                                             fingerprint = Fingerprints[CurrentFingerprint].fingerprint
                                         }
                                         TriggerServerEvent('evidence:server:AddFingerprintToInventory', CurrentFingerprint, info)
+                                        if Config.Inventory == "ox" then
+                                            exports.ox_inventory:displayMetadata({
+                                                label = 'Label',
+                                                type = 'Type',
+                                                street = 'Street',
+                                                fingerprint = 'Fingerprint'
+                                            })
+                                        end
                                     end
                                 end
                             end
@@ -831,6 +872,16 @@ CreateThread(function()
                                             serie = Bullethole[CurrentBullethole].serie
                                         }
                                         TriggerServerEvent('evidence:server:AddBulletToInventory', CurrentBullethole, info)
+                                        if Config.Inventory == "ox" then
+                                            exports.ox_inventory:displayMetadata({
+                                                label = 'Label',
+                                                type = 'Type',
+                                                street = 'Street',
+                                                ammolabel = 'Ammo Label',
+                                                ammotype = 'Ammo Type',
+                                                serie = 'Serial'
+                                            })
+                                        end
                                     end
                                 end
                             end
@@ -871,6 +922,16 @@ CreateThread(function()
                                             serie = Fragements[CurrentVehicleFragement].serie
                                         }
                                         TriggerServerEvent('evidence:server:AddFragementToInventory', CurrentVehicleFragement, info)
+                                        if Config.Inventory == "ox" then
+                                            exports.ox_inventory:displayMetadata({
+                                                label = 'Label',
+                                                type = 'Type',
+                                                street = 'Street',
+                                                rgb = '',
+                                                ammotype = 'Ammo Type',
+                                                serie = 'Serial'
+                                            })
+                                        end
                                     end
                                 end
                             end
