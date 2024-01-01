@@ -56,7 +56,6 @@ evidencecleaningkit         = { name = 'evidencecleaningkit', label = 'Evidence 
             }
 ```
 - Replace both files inside `REPLACE THESE WITH THE ONES FROM POLICEJOB` with the same named ones from qb-policejob ( To prevent duplicating )
-- Add the following code to your app.js of your inventory (31.12.2023 Version  ->  line 365 )
 - Remove the following code from your `qb-policejob/config.lua`
 ```
 Config.AmmoLabels = {
