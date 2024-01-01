@@ -22,6 +22,7 @@ local currentTime = 0
 local r, g, b = 0, 0, 0
 
 local drawLine_r, drawLine_g, drawLine_b = 0, 0, 0
+local coolDown = false
 
 local WhitelistedWeapons = {
     `weapon_unarmed`,
@@ -63,7 +64,7 @@ local function DropBulletCasing(weapon, ped, currentTime)
     local randY = math.random() + math.random(-1, 1)
     local coords = GetOffsetFromEntityInWorldCoords(ped, randX, randY, 0)
     TriggerServerEvent('evidence:server:CreateCasing', weapon, coords, currentTime)
-    Wait(350)
+    Wait(150)
 end
 
 local function SendBulletHole(weapon, raycastcoords, pedcoords, heading, currentTime, entityHit, r, g, b)
@@ -73,7 +74,7 @@ local function SendBulletHole(weapon, raycastcoords, pedcoords, heading, current
         else
             TriggerServerEvent('evidence:server:CreateBullethole', weapon, raycastcoords, pedcoords, heading, currentTime)
         end
-        Wait(350)
+        Wait(150)
     end
 end
 
@@ -595,14 +596,13 @@ end)
 ------------------------------------------------------------------------------[ THREADS ]------------------------------------------------------------------------------
 
 -----------------------------------------[ DROP EVIDENCE ]-----------------------------------------
-CreateThread(function()
-    while true do
-        Wait(3)
+AddEventHandler('CEventGunShot', function(witnesses, ped)
+    if not coolDown then
         if PlayerJob.type == 'leo' and not Config.PoliceCreatesEvidence then return end
-        local ped = PlayerPedId()
         if IsPedShooting(ped) then
-            local pedcoords = GetEntityCoords(PlayerPedId())
-            local heading = GetEntityHeading(PlayerPedId())
+            coolDown = true
+            local pedcoords = GetEntityCoords(ped)
+            local heading = GetEntityHeading(ped)
 
             local hit, raycastcoords, entityHit = RayCastGamePlayCamera(1000.0)
             local weapon = GetSelectedPedWeapon(ped)
@@ -613,6 +613,9 @@ CreateThread(function()
                 SendBulletHole(weapon, raycastcoords, pedcoords, heading, currentTime, entityHit, r, g, b)
                 DropBulletCasing(weapon, ped, currentTime)
             end
+            SetTimeout(350, function()
+                coolDown = false
+            end)
         end
     end
 end)
@@ -690,13 +693,13 @@ CreateThread(function()
     end
 end)
 
------------------------------------------[ CHECK WITH FLASHLIGHT ]-----------------------------------------
+-----------------------------------------[ CHECK WITH FLASHLIGHT OR CAMERA ]-----------------------------------------
 CreateThread(function()
     while true do
         Wait(5)
         if LocalPlayer.state.isLoggedIn then
             if PlayerJob.type == 'leo' and PlayerJob.onduty then
-                if IsPlayerFreeAiming(PlayerId()) and GetSelectedPedWeapon(PlayerPedId()) == `WEAPON_FLASHLIGHT` then
+                if (IsPlayerFreeAiming(PlayerId()) and GetSelectedPedWeapon(PlayerPedId()) == `WEAPON_FLASHLIGHT`) or IsEntityPlayingAnim(PlayerPedId(), "amb@world_human_tourist_map@male@base", "base", 3) then
                     local pos = GetEntityCoords(PlayerPedId(), true)
                     local hit, coords = RayCastGamePlayCamera(1000.0)
                     if next(Casings) then
@@ -847,12 +850,12 @@ CreateThread(function()
                                     DrawLine(v.coords.x, v.coords.y, v.coords.z -0.05, v.pedcoord.x, v.pedcoord.y, v.pedcoord.z, v.drawLine_r, v.drawLine_g, v.drawLine_b, 255)
                                 end
                                 if GetEntityType(entityHit) then
-                                    if dist < 7.5 and dist > 2.5 then
+                                    if dist < 7.5 and dist > 1.5 then
                                         DrawText3D(v.coords.x, v.coords.y, v.coords.z +0.05, Lang:t('info.vehicle_fragement'))
                                     end
                                     DrawMarker(36, v.coords.x, v.coords.y, v.coords.z -0.05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.3, 0.2, v.r, v.g, v.b, 220, false, true, 2, nil, nil, false)
                                 end
-                                if raycastdist < 0.25 and dist < 2.5 then
+                                if dist < 1.5 then
                                     DrawText3D(v.coords.x, v.coords.y, v.coords.z  -0.05, Lang:t('info.bullet_casing'))
                                     if IsControlJustReleased(0, 23) then
                                         local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
