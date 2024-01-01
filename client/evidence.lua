@@ -22,7 +22,6 @@ local currentTime = 0
 local r, g, b = 0, 0, 0
 
 local drawLine_r, drawLine_g, drawLine_b = 0, 0, 0
-local coolDown = false
 
 local WhitelistedWeapons = {
     `weapon_unarmed`,
@@ -64,7 +63,7 @@ local function DropBulletCasing(weapon, ped, currentTime)
     local randY = math.random() + math.random(-1, 1)
     local coords = GetOffsetFromEntityInWorldCoords(ped, randX, randY, 0)
     TriggerServerEvent('evidence:server:CreateCasing', weapon, coords, currentTime)
-    Wait(150)
+    Wait(350)
 end
 
 local function SendBulletHole(weapon, raycastcoords, pedcoords, heading, currentTime, entityHit, r, g, b)
@@ -74,7 +73,7 @@ local function SendBulletHole(weapon, raycastcoords, pedcoords, heading, current
         else
             TriggerServerEvent('evidence:server:CreateBullethole', weapon, raycastcoords, pedcoords, heading, currentTime)
         end
-        Wait(150)
+        Wait(350)
     end
 end
 
@@ -596,13 +595,14 @@ end)
 ------------------------------------------------------------------------------[ THREADS ]------------------------------------------------------------------------------
 
 -----------------------------------------[ DROP EVIDENCE ]-----------------------------------------
-AddEventHandler('CEventGunShot', function(witnesses, ped)
-    if not coolDown then
+CreateThread(function()
+    while true do
+        Wait(3)
         if PlayerJob.type == 'leo' and not Config.PoliceCreatesEvidence then return end
+        local ped = PlayerPedId()
         if IsPedShooting(ped) then
-            coolDown = true
-            local pedcoords = GetEntityCoords(ped)
-            local heading = GetEntityHeading(ped)
+            local pedcoords = GetEntityCoords(PlayerPedId())
+            local heading = GetEntityHeading(PlayerPedId())
 
             local hit, raycastcoords, entityHit = RayCastGamePlayCamera(1000.0)
             local weapon = GetSelectedPedWeapon(ped)
@@ -613,9 +613,6 @@ AddEventHandler('CEventGunShot', function(witnesses, ped)
                 SendBulletHole(weapon, raycastcoords, pedcoords, heading, currentTime, entityHit, r, g, b)
                 DropBulletCasing(weapon, ped, currentTime)
             end
-            SetTimeout(350, function()
-                coolDown = false
-            end)
         end
     end
 end)
