@@ -76,7 +76,7 @@ Config.AmmoLabels = {
 - DrawLine of the Shooting Position
 - Evidence can be checked via weapon_flashlight ( can be picked up )
 - Criminals can remove evidence
-- Evidence automatically removes after 30Min. (Performance thing)
+- Evidence automatically removes after 45Min. (Performance thing)
 
 ### Commands
 - /clearblood - Clears nearby blood drops.
