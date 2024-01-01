@@ -8,10 +8,10 @@ Config.ShowShootersLine = true
 Config.PoliceCreatesEvidence = true
 
 ---------[ "qb" for qb-core Notify    or    "ox" for ox_lib Notify ]---------
-Config.Notify = "ox"
+Config.Notify = "qb"
 
 ---------[ "qb" for qb-core Commands (less performants)   or    "ox" for ox_lib Commands ]---------
-Config.Commands = "ox"
+Config.Commands = "qb"
 
 -- SOON -- Config.Inventory = "qb" -- "qb" for qb/ps/lj-inventory    or    "ox" for ox_inventory
 
