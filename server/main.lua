@@ -323,8 +323,8 @@ end)
 QBCore.Functions.CreateUseableItem("evidencecleaningkit", function(source)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
-    if not Player.Functions.RemoveItem("evidencecleaningkit", 1) then return end
     if Player.PlayerData.job.type == 'leo' and Player.PlayerData.job.onduty then
+        if not Player.Functions.RemoveItem("evidencecleaningkit", 1) then return end
         TriggerClientEvent('evidence:client:ClearScene', src)
     else
         if Config.Notify == "qb" then
