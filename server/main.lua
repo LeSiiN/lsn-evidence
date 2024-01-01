@@ -320,6 +320,22 @@ QBCore.Functions.CreateUseableItem("rag", function(source)
     TriggerClientEvent('evidence:client:ClearSceneCrime', src)
 end)
 
+QBCore.Functions.CreateUseableItem("evidencecleaningkit", function(source)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    if not Player.Functions.RemoveItem("evidencecleaningkit", 1) then return end
+    if Player.PlayerData.job.type == 'leo' and Player.PlayerData.job.onduty then
+        TriggerClientEvent('evidence:client:ClearScene', src)
+    else
+        if Config.Notify == "qb" then
+            TriggerClientEvent('QBCore:Notify', src, Lang:t('error.on_duty_police_only'), 'error')
+        elseif Config.Notify == "ox" then
+            TriggerClientEvent("ox_lib:notify", src, {title= "Evidence", description= Lang:t('error.on_duty_police_only'), type= 'error'})
+        else
+            print(Lang:t('error.config_error'))
+        end
+    end
+end)
 ------------------------------------------------------------------------------[ EVENTS ]------------------------------------------------------------------------------
 
 -----------------------------------------[ BLOOD ]-----------------------------------------
