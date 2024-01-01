@@ -55,7 +55,7 @@ evidencecleaningkit         = { name = 'evidencecleaningkit', label = 'Evidence 
                 <p><strong>DNA Code: </strong><span>${itemData.info.dnalabel}</span></p><br /><p>${itemData.description}</p>`;
             }
 ```
-- Replace both files inside `REPLACE THESE WITH THE ONES FROM POLICEJOB` with the same named ones from qb-policejob ( To prevent duplicating )
+- Replace both files inside `REPLACE THESE WITH THE ONES FROM POLICEJOB` with the same named ones from qb-policejob ( client/evidence.lua and server/main.lua )
 - Remove the following code from your `qb-policejob/config.lua`
 ```
 Config.AmmoLabels = {
