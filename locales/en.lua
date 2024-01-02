@@ -1,5 +1,6 @@
 local Translations = {
     error = {
+        have_evidence_bag = 'You need an evidence bag to take the evidence',
         blood_not_cleared = 'Blood NOT cleared',
         bullet_casing_not_removed = 'Bullet Casings NOT Removed',
         bullet_hole_not_removed = 'Bullet Holes NOT Removed',
@@ -13,7 +14,7 @@ local Translations = {
         bullet_hole_removed = 'Bullet Holes Removed...',
         vehicle_fragement_removed = 'Vehicle Fragements Removed...',
         crime_scene_removed = 'Crime Scene Removed...',
- },
+    },
     info = {
         dna_sample = 'DNA Sample',
         bullet_casing = '[~g~F~s~] Pick up',
