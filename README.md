@@ -1,12 +1,11 @@
 # lsn-evidence
     This Script was made from the evidence Code from qb-policejob! Please follow the Installation!
 
-## Dependencies
+# Dependencies
 - [qb-core](https://github.com/qbcore-framework/qb-core)
 - [ox_lib](https://github.com/overextended/ox_lib/releases)
 
-## Installation
-### Manual
+# Installation
 - Download the script and put it in the `resources` directory.
 - Add the following code to your server.cfg/resouces.cfg ( Make sure that ox_lib starts before qb-core and lsn-evidence at last )
 ```
@@ -68,7 +67,7 @@ Config.AmmoLabels = {
     ['AMMO_SNIPER'] = 'Large caliber bullet',
 }
 ```
-## Features
+# Features
 - Bullet casings as Evidence
 - Blood drop as Evidence
 - Fingerprint drops as Evidence
@@ -79,7 +78,7 @@ Config.AmmoLabels = {
 - Criminals can remove evidence
 - Evidence automatically removes after 45Min. (Performance thing)
 
-### Commands ( OPTIONAL )
+# Commands ( OPTIONAL )
 - /clearblood - Clears nearby blood drops.
 - /clearcasings - Clears nearby bullet casings.
 - /clearholes - Clears nearby Bullet Holes drops.
@@ -87,6 +86,10 @@ Config.AmmoLabels = {
 - /clearscene - Clears all nearby evidence drops.
 - /takedna [id] - Takes a DNA sample from the player.
 
-### New Items
+# New Items
 - rag - Allows Criminals to delete nearby Evidence.
 - evidencecleaningkit - Allows Police Officers to remove evidence. ( No need for the commands then )
+
+# Credits
+- [RazerGhost](https://github.com/RazerGhost)
+- [My little Family](https://github.com/Project-Sloth)
