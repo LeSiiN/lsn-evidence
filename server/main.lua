@@ -80,112 +80,7 @@ local function DnaHash(s)
 end
 
 ------------------------------------------------------------------------------[ COMMANDS ]------------------------------------------------------------------------------
-if Config.Commands == "qb" then
-    QBCore.Commands.Add('clearcasings', Lang:t('commands.clear_casign'), {}, false, function(source)
-        local src = source
-        local Player = QBCore.Functions.GetPlayer(src)
-        if Player.PlayerData.job.type == 'leo' and Player.PlayerData.job.onduty then
-            TriggerClientEvent('evidence:client:ClearCasingsInArea', src)
-        else
-            if Config.Notify == "qb" then
-                TriggerClientEvent('QBCore:Notify', src, Lang:t('error.on_duty_police_only'), 'error')
-            elseif Config.Notify == "ox" then
-                TriggerClientEvent("ox_lib:notify", src, {title= "Evidence", description= Lang:t('error.on_duty_police_only'), type= 'error'})
-            else
-                print(Lang:t('error.config_error'))
-            end
-        end
-    end)
-
-    QBCore.Commands.Add('clearholes', Lang:t('commands.clear_bullethole'), {}, false, function(source)
-        local src = source
-        local Player = QBCore.Functions.GetPlayer(src)
-        if Player.PlayerData.job.type == 'leo' and Player.PlayerData.job.onduty then
-            TriggerClientEvent('evidence:client:ClearBulletholeInArea', src)
-        else
-            if Config.Notify == "qb" then
-                TriggerClientEvent('QBCore:Notify', src, Lang:t('error.on_duty_police_only'), 'error')
-            elseif Config.Notify == "ox" then
-                TriggerClientEvent("ox_lib:notify", src, {title= "Evidence", description= Lang:t('error.on_duty_police_only'), type= 'error'})
-            else
-                print(Lang:t('error.config_error'))
-            end
-        end
-    end)
-
-    QBCore.Commands.Add('clearfragements', Lang:t('commands.clear_fragements'), {}, false, function(source)
-        local src = source
-        local Player = QBCore.Functions.GetPlayer(src)
-        if Player.PlayerData.job.type == 'leo' and Player.PlayerData.job.onduty then
-            TriggerClientEvent('evidence:client:ClearVehicleFragementsInArea', src)
-        else
-            if Config.Notify == "qb" then
-                TriggerClientEvent('QBCore:Notify', src, Lang:t('error.on_duty_police_only'), 'error')
-            elseif Config.Notify == "ox" then
-                TriggerClientEvent("ox_lib:notify", src, {title= "Evidence", description= Lang:t('error.on_duty_police_only'), type= 'error'})
-            else
-                print(Lang:t('error.config_error'))
-            end
-        end
-    end)
-
-    QBCore.Commands.Add('clearscene', Lang:t('commands.clear_crime_scene'), {}, false, function(source)
-        local src = source
-        local Player = QBCore.Functions.GetPlayer(src)
-        if Player.PlayerData.job.type == 'leo' and Player.PlayerData.job.onduty then
-            TriggerClientEvent('evidence:client:ClearScene', src)
-        else
-            if Config.Notify == "qb" then
-                TriggerClientEvent('QBCore:Notify', src, Lang:t('error.on_duty_police_only'), 'error')
-            elseif Config.Notify == "ox" then
-                TriggerClientEvent("ox_lib:notify", src, {title= "Evidence", description= Lang:t('error.on_duty_police_only'), type= 'error'})
-            else
-                print(Lang:t('error.config_error'))
-            end
-        end
-    end)
-
-    QBCore.Commands.Add('clearblood', Lang:t('commands.clearblood'), {}, false, function(source)
-        local src = source
-        local Player = QBCore.Functions.GetPlayer(src)
-        if Player.PlayerData.job.type == 'leo' and Player.PlayerData.job.onduty then
-            TriggerClientEvent('evidence:client:ClearBlooddropsInArea', src)
-        else
-            if Config.Notify == "qb" then
-                TriggerClientEvent('QBCore:Notify', src, Lang:t('error.on_duty_police_only'), 'error')
-            elseif Config.Notify == "ox" then
-                TriggerClientEvent("ox_lib:notify", src, {title= "Evidence", description= Lang:t('error.on_duty_police_only'), type= 'error'})
-            else
-                print(Lang:t('error.config_error'))
-            end
-        end
-    end)
-
-    QBCore.Commands.Add('takedna', Lang:t('commands.takedna'), { { name = 'id', help = Lang:t('info.player_id') } }, true, function(source, args)
-        local src = source
-        local Player = QBCore.Functions.GetPlayer(src)
-        local OtherPlayer = QBCore.Functions.GetPlayer(tonumber(args[1]))
-        if not OtherPlayer or Player.PlayerData.job.name ~= 'police' or not Player.PlayerData.job.onduty then return end
-        if Player.Functions.RemoveItem('empty_evidence_bag', 1) then
-            local info = {
-                label = Lang:t('info.dna_sample'),
-                type = 'dna',
-                dnalabel = DnaHash(OtherPlayer.PlayerData.citizenid)
-            }
-            if not Player.Functions.AddItem('filled_evidence_bag', 1, false, info) then return end
-            TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['filled_evidence_bag'], 'add')
-        else
-            if Config.Notify == "qb" then
-                TriggerClientEvent('QBCore:Notify', src, Lang:t('error.on_duty_police_only'), 'error')
-            elseif Config.Notify == "ox" then
-                TriggerClientEvent("ox_lib:notify", src, {title= "Evidence", description= Lang:t('error.on_duty_police_only'), type= 'error'})
-            else
-                print(Lang:t('error.config_error'))
-            end
-        end
-    end)
-elseif Config.Commands == "ox" then
-
+if Config.Commands then
     lib.addCommand('clearcasings', {
         help = Lang:t('commands.clear_casign')
     }, function(source, raw)
@@ -308,8 +203,6 @@ elseif Config.Commands == "ox" then
             end
         end
     end)
-else
-    print(Lang:t('error.config_error'))
 end
 ------------------------------------------------------------------------------[ ITEMS ]------------------------------------------------------------------------------
 QBCore.Functions.CreateUseableItem("rag", function(source)
@@ -336,6 +229,45 @@ QBCore.Functions.CreateUseableItem("evidencecleaningkit", function(source)
         end
     end
 end)
+
+QBCore.Functions.CreateUseableItem("dnatester", function(source)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    local ClosestPlayer = QBCore.Functions.GetClosestPlayer()
+    
+    if ClosestPlayer then
+        if Player.PlayerData.job.type == 'leo' and Player.PlayerData.job.onduty then
+            if Player.Functions.RemoveItem("empty_evidence_bag", 1) then
+                local info = {
+                    label = Lang:t('info.dna_sample'),
+                    type = "dna",
+                    dnalabel = DnaHash(ClosestPlayer.PlayerData.citizenid)
+                }
+                if not Player.Functions.AddItem("filled_evidence_bag", 1, false, info) then return end
+                TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["filled_evidence_bag"], "add")
+            else
+                TriggerClientEvent('QBCore:Notify', src, Lang:t("error.have_evidence_bag"), "error")
+            end
+        else
+            if Config.Notify == "qb" then
+                TriggerClientEvent('QBCore:Notify', src, Lang:t('error.on_duty_police_only'), 'error')
+            elseif Config.Notify == "ox" then
+                TriggerClientEvent("ox_lib:notify", src, {title= "Evidence", description= Lang:t('error.on_duty_police_only'), type= 'error'})
+            else
+                print(Lang:t('error.config_error'))
+            end
+        end
+    else
+        if Config.Notify == "qb" then
+            TriggerClientEvent('QBCore:Notify', src, Lang:t('error.no_player'), 'error')
+        elseif Config.Notify == "ox" then
+            TriggerClientEvent("ox_lib:notify", src, {title= "Evidence", description= Lang:t('error.no_player'), type= 'error'})
+        else
+            print(Lang:t('error.config_error'))
+        end
+    end
+end)
+
 ------------------------------------------------------------------------------[ EVENTS ]------------------------------------------------------------------------------
 
 -----------------------------------------[ BLOOD ]-----------------------------------------

@@ -18,6 +18,7 @@ ensure lsn-evidence
 ```
 rag                         = { name = 'rag', label = 'Rag', weight = 100, type = 'item', image = 'rag.png', unique = false, useable = true, shouldClose = true, combinable = nil, description = 'Could get Handy.' },
 evidencecleaningkit         = { name = 'evidencecleaningkit', label = 'Evidence Cleaning Kit', weight = 250, type = 'item', image = 'cleaningkit.png', unique = false, useable = true, shouldClose = true, combinable = nil, description = 'Cleans every Evidence near a police Officer.' },
+dnatester                   = { name = 'dnatester', label = 'DNA Tester', weight = 250, type = 'item', image = 'dnatester.png', unique = true, useable = true, shouldClose = true, combinable = nil, description = 'Tests DNA.' },
 ```
 - Place the image inside your images folder in your inventory. ( ox-inventory will follow! )
 - Add the following code to your app.js of your inventory (31.12.2023 Version  ->  line 365 )
@@ -55,12 +56,8 @@ evidencecleaningkit         = { name = 'evidencecleaningkit', label = 'Evidence 
                 <p><strong>DNA Code: </strong><span>${itemData.info.dnalabel}</span></p><br /><p>${itemData.description}</p>`;
             }
 ```
-- If your using default qb-policejob use files inside here `[qb-policejob] REPLACE THESE` if your using hi-dev's version, use the files inside here `[hi-dev - qb-policejob] REPLACE THESE`
- 
-- Replace `evidence.lua` inside `[qb-policejob] REPLACE THESE` or `[hi-dev - qb-policejob] REPLACE THESE` with the `qb-policejob/client/evidence.lua`
- 
-- Replace `main.lua` inside `[qb-policejob] REPLACE THESE` or `[hi-dev - qb-policejob] REPLACE THESE` with the `qb-policejob/server/main.lua`
- 
+- Replace `evidence.lua` inside `REPLACE THESE WITH THE ONES FROM POLICEJOB` with the `qb-policejob/client/evidence.lua`
+- Replace `main.lua` inside `REPLACE THESE WITH THE ONES FROM POLICEJOB` with the `qb-policejob/server/main.lua`
 - Remove the following code from your `qb-policejob/config.lua`
 ```
 Config.AmmoLabels = {
@@ -83,7 +80,7 @@ Config.AmmoLabels = {
 - Criminals can remove evidence
 - Evidence automatically removes after 45Min. (Performance thing)
 
-### Commands
+### Commands ( OPTIONAL )
 - /clearblood - Clears nearby blood drops.
 - /clearcasings - Clears nearby bullet casings.
 - /clearholes - Clears nearby Bullet Holes drops.
@@ -94,3 +91,4 @@ Config.AmmoLabels = {
 ### New Items
 - rag - Allows Criminals to delete nearby Evidence.
 - evidencecleaningkit - Allows Police Officers to remove evidence. ( No need for the commands then )
+- dnatester - Allows Police Officers to get the DNA hash of the nearest Player.

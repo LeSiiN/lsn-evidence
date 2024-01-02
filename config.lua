@@ -1,17 +1,17 @@
 Config = {}
 
 ---------[ If TRUE it shows the Line from where the Shooter shoot the bullet DEFAULT = RED ]---------
----------[ If Config.PoliceCreatesEvidence on TRUE DrawLine will be Green if the shoot was from a Police Officer ]---------
 Config.ShowShootersLine = true
 
 ---------[ If TRUE Police will create evidence aswell ]---------
+---------[ If Config.PoliceCreatesEvidence on TRUE DrawLine will be Green if the shoot was from a Police Officer ]---------
 Config.PoliceCreatesEvidence = true
+
+---------[ Enable or Disable Commands ]---------
+Config.Commands = true
 
 ---------[ "qb" for qb-core Notify    or    "ox" for ox_lib Notify ]---------
 Config.Notify = "qb"
-
----------[ "qb" for qb-core Commands (less performants)   or    "ox" for ox_lib Commands ]---------
-Config.Commands = "qb"
 
 -- SOON -- Config.Inventory = "qb" -- "qb" for qb/ps/lj-inventory    or    "ox" for ox_inventory
 Config.Inventory = "ox"
