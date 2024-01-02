@@ -7,6 +7,8 @@ local Translations = {
         vehicle_fragements_not_removed = 'Vehicle Fragements NOT Removed',
         scene_not_removed = 'Crime Scene NOT Removed',
         config_error = 'LSN-EVIDENCE: Something is wrong in the Config',
+        no_player = 'No Player in reach!',
+        have_evidence_bag = 'You must have an empty evidence bag with you',
     },
     success = {
         blood_clear = 'Blood Cleared',

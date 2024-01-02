@@ -1,12 +1,11 @@
 # lsn-evidence
     This Script was made from the evidence Code from qb-policejob! Please follow the Installation!
 
-## Dependencies
+# Dependencies
 - [qb-core](https://github.com/qbcore-framework/qb-core)
 - [ox_lib](https://github.com/overextended/ox_lib/releases)
 
-## Installation
-### Manual
+# Installation
 - Download the script and put it in the `resources` directory.
 - Add the following code to your server.cfg/resouces.cfg ( Make sure that ox_lib starts before qb-core and lsn-evidence at last )
 ```
@@ -18,7 +17,6 @@ ensure lsn-evidence
 ```
 rag                         = { name = 'rag', label = 'Rag', weight = 100, type = 'item', image = 'rag.png', unique = false, useable = true, shouldClose = true, combinable = nil, description = 'Could get Handy.' },
 evidencecleaningkit         = { name = 'evidencecleaningkit', label = 'Evidence Cleaning Kit', weight = 250, type = 'item', image = 'cleaningkit.png', unique = false, useable = true, shouldClose = true, combinable = nil, description = 'Cleans every Evidence near a police Officer.' },
-dnatester                   = { name = 'dnatester', label = 'DNA Tester', weight = 250, type = 'item', image = 'dnatester.png', unique = true, useable = true, shouldClose = true, combinable = nil, description = 'Tests DNA.' },
 ```
 - Place the image inside your images folder in your inventory. ( ox-inventory will follow! )
 - Add the following code to your app.js of your inventory (31.12.2023 Version  ->  line 365 )
@@ -69,7 +67,7 @@ Config.AmmoLabels = {
     ['AMMO_SNIPER'] = 'Large caliber bullet',
 }
 ```
-## Features
+# Features
 - Bullet casings as Evidence
 - Blood drop as Evidence
 - Fingerprint drops as Evidence
@@ -80,7 +78,7 @@ Config.AmmoLabels = {
 - Criminals can remove evidence
 - Evidence automatically removes after 45Min. (Performance thing)
 
-### Commands ( OPTIONAL )
+# Commands ( OPTIONAL )
 - /clearblood - Clears nearby blood drops.
 - /clearcasings - Clears nearby bullet casings.
 - /clearholes - Clears nearby Bullet Holes drops.
@@ -88,7 +86,10 @@ Config.AmmoLabels = {
 - /clearscene - Clears all nearby evidence drops.
 - /takedna [id] - Takes a DNA sample from the player.
 
-### New Items
+# New Items
 - rag - Allows Criminals to delete nearby Evidence.
 - evidencecleaningkit - Allows Police Officers to remove evidence. ( No need for the commands then )
-- dnatester - Allows Police Officers to get the DNA hash of the nearest Player.
+
+# Credits
+- [RazerGhost](https://github.com/RazerGhost)
+- [My little Family](https://github.com/Project-Sloth)
