@@ -234,7 +234,7 @@ QBCore.Functions.CreateUseableItem("dnatester", function(source)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     local ClosestPlayer = QBCore.Functions.GetClosestPlayer()
-    
+
     if ClosestPlayer then
         if Player.PlayerData.job.type == 'leo' and Player.PlayerData.job.onduty then
             if Player.Functions.RemoveItem("empty_evidence_bag", 1) then
@@ -303,7 +303,7 @@ RegisterNetEvent('evidence:server:AddBlooddropToInventory', function(bloodId, bl
             info.dnalabel = bloodInfo.dnalabel
             info.bloodtype = bloodInfo.bloodtype
             if exports.ox_inventory:CanCarryItem(src, 'filled_evidence_bag', 1) then
-                exports.ox_inventory:AddItem(src, 'filled_evidence_bag', 1, bloodInfo)
+                exports.ox_inventory:AddItem(src, 'filled_evidence_bag', 1, info)
             end
             TriggerClientEvent('evidence:client:RemoveBlooddrop', -1, bloodId)
             BloodDrops[bloodId] = nil
@@ -384,11 +384,20 @@ RegisterNetEvent('evidence:server:CreateCasing', function(weapon, coords, curren
     local casingId = CreateCasingId()
     local weaponInfo = QBCore.Shared.Weapons[weapon]
     local serieNumber = nil
-    if weaponInfo then
-        local weaponItem = Player.Functions.GetItemByName(weaponInfo['name'])
-        if weaponItem then
-            if weaponItem.info and weaponItem.info ~= '' then
-                serieNumber = weaponItem.info.serie
+    if Config.Inventory == "ox" then
+        weaponInfo = exports.ox_inventory:GetCurrentWeapon(src)
+        if weaponInfo then
+            if weaponInfo.metadata and weaponInfo.metadata ~= '' then
+                serieNumber = weaponInfo.metadata.serial
+            end
+        end
+    else
+        if weaponInfo then
+            local weaponItem = Player.Functions.GetItemByName(weaponInfo['name'])
+            if weaponItem then
+                if weaponItem.info and weaponItem.info ~= '' then
+                    serieNumber = weaponItem.info.serie
+                end
             end
         end
     end
@@ -447,11 +456,20 @@ RegisterNetEvent('evidence:server:CreateBullethole', function(weapon, raycastcoo
     local bulletholeId = CreateBulletholeId()
     local weaponInfo = QBCore.Shared.Weapons[weapon]
     local serieNumber = nil
-    if weaponInfo then
-        local weaponItem = Player.Functions.GetItemByName(weaponInfo['name'])
-        if weaponItem then
-            if weaponItem.info and weaponItem.info ~= '' then
-                serieNumber = weaponItem.info.serie
+    if Config.Inventory == "ox" then
+        weaponInfo = exports.ox_inventory:GetCurrentWeapon(src)
+        if weaponInfo then
+            if weaponInfo.metadata and weaponInfo.metadata ~= '' then
+                serieNumber = weaponInfo.metadata.serial
+            end
+        end
+    else
+        if weaponInfo then
+            local weaponItem = Player.Functions.GetItemByName(weaponInfo['name'])
+            if weaponItem then
+                if weaponItem.info and weaponItem.info ~= '' then
+                    serieNumber = weaponItem.info.serie
+                end
             end
         end
     end
@@ -509,11 +527,20 @@ RegisterNetEvent('evidence:server:CreateVehicleFragement', function(weapon, rayc
     local vehiclefragementId = CreateVehicleFragementId()
     local weaponInfo = QBCore.Shared.Weapons[weapon]
     local serieNumber = nil
-    if weaponInfo then
-        local weaponItem = Player.Functions.GetItemByName(weaponInfo['name'])
-        if weaponItem then
-            if weaponItem.info and weaponItem.info ~= '' then
-                serieNumber = weaponItem.info.serie
+    if Config.Inventory == "ox" then
+        weaponInfo = exports.ox_inventory:GetCurrentWeapon(src)
+        if weaponInfo then
+            if weaponInfo.metadata and weaponInfo.metadata ~= '' then
+                serieNumber = weaponInfo.metadata.serial
+            end
+        end
+    else
+        if weaponInfo then
+            local weaponItem = Player.Functions.GetItemByName(weaponInfo['name'])
+            if weaponItem then
+                if weaponItem.info and weaponItem.info ~= '' then
+                    serieNumber = weaponItem.info.serie
+                end
             end
         end
     end
