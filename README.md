@@ -18,7 +18,6 @@ ensure lsn-evidence
 ```
 rag                         = { name = 'rag', label = 'Rag', weight = 100, type = 'item', image = 'rag.png', unique = false, useable = true, shouldClose = true, combinable = nil, description = 'Could get Handy.' },
 evidencecleaningkit         = { name = 'evidencecleaningkit', label = 'Evidence Cleaning Kit', weight = 250, type = 'item', image = 'cleaningkit.png', unique = false, useable = true, shouldClose = true, combinable = nil, description = 'Cleans every Evidence near a police Officer.' },
-dnatester                   = { name = 'dnatester', label = 'DNA Tester', weight = 250, type = 'item', image = 'dnatester.png', unique = true, useable = true, shouldClose = true, combinable = nil, description = 'Tests DNA.' },
 ```
 - Place the image inside your images folder in your inventory. ( ox-inventory will follow! )
 - Add the following code to your app.js of your inventory (31.12.2023 Version  ->  line 365 )
@@ -91,4 +90,3 @@ Config.AmmoLabels = {
 ### New Items
 - rag - Allows Criminals to delete nearby Evidence.
 - evidencecleaningkit - Allows Police Officers to remove evidence. ( No need for the commands then )
-- dnatester - Allows Police Officers to get the DNA hash of the nearest Player.
