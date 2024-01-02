@@ -235,23 +235,33 @@ QBCore.Functions.CreateUseableItem("dnatester", function(source)
     local Player = QBCore.Functions.GetPlayer(src)
     local ClosestPlayer = QBCore.Functions.GetClosestPlayer()
     
-    if not ClosestPlayer or Player.PlayerData.job.name ~= "police" or not Player.PlayerData.job.onduty then 
-        if Player.Functions.RemoveItem("empty_evidence_bag", 1) then
-            local info = {
-                label = Lang:t('info.dna_sample'),
-                type = "dna",
-                dnalabel = DnaHash(ClosestPlayer.PlayerData.citizenid)
-            }
-            if not Player.Functions.AddItem("filled_evidence_bag", 1, false, info) then return end
-            TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["filled_evidence_bag"], "add")
+    if ClosestPlayer then
+        if Player.PlayerData.job.type == 'leo' and Player.PlayerData.job.onduty then
+            if Player.Functions.RemoveItem("empty_evidence_bag", 1) then
+                local info = {
+                    label = Lang:t('info.dna_sample'),
+                    type = "dna",
+                    dnalabel = DnaHash(ClosestPlayer.PlayerData.citizenid)
+                }
+                if not Player.Functions.AddItem("filled_evidence_bag", 1, false, info) then return end
+                TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items["filled_evidence_bag"], "add")
+            else
+                TriggerClientEvent('QBCore:Notify', src, Lang:t("error.have_evidence_bag"), "error")
+            end
         else
-            TriggerClientEvent('QBCore:Notify', src, Lang:t("error.have_evidence_bag"), "error")
+            if Config.Notify == "qb" then
+                TriggerClientEvent('QBCore:Notify', src, Lang:t('error.on_duty_police_only'), 'error')
+            elseif Config.Notify == "ox" then
+                TriggerClientEvent("ox_lib:notify", src, {title= "Evidence", description= Lang:t('error.on_duty_police_only'), type= 'error'})
+            else
+                print(Lang:t('error.config_error'))
+            end
         end
     else
         if Config.Notify == "qb" then
-            TriggerClientEvent('QBCore:Notify', src, Lang:t('error.on_duty_police_only'), 'error')
+            TriggerClientEvent('QBCore:Notify', src, Lang:t('error.no_player'), 'error')
         elseif Config.Notify == "ox" then
-            TriggerClientEvent("ox_lib:notify", src, {title= "Evidence", description= Lang:t('error.on_duty_police_only'), type= 'error'})
+            TriggerClientEvent("ox_lib:notify", src, {title= "Evidence", description= Lang:t('error.no_player'), type= 'error'})
         else
             print(Lang:t('error.config_error'))
         end
