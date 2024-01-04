@@ -67,6 +67,58 @@ Config.AmmoLabels = {
     ['AMMO_SNIPER'] = 'Large caliber bullet',
 }
 ```
+
+# IF USING HI-DEV POLICEJOB ALSO DO THIS:
+- Replace `police:client:FindEvidenceBag` inside your client/main.lua
+```
+RegisterNetEvent('police:client:FindEvidenceBag', function()
+    local PlayerData = QBCore.Functions.GetPlayerData()
+    local FindEvidence = {}
+    FindEvidence[#FindEvidence+1] = {opthead = Lang:t('evidence.examine_menu_blood_h'), optdesc = Lang:t('evidence.examine_menu_blood_b'), opticon = 'droplet',
+        optparams = {
+            event = 'police:client:SelectEvidence',
+            args = {type = 'blood', label = 'Blood', icon = 'droplet'}
+        }}
+    FindEvidence[#FindEvidence+1] = {opthead = Lang:t('evidence.examine_menu_casing_h'), optdesc = Lang:t('evidence.examine_menu_casing_b'), opticon = 'joint',
+        optparams = {
+            event = 'police:client:SelectEvidence',
+            args = {type = 'casing', label = 'Bullet casing', icon = 'joint'}
+        }}
+    FindEvidence[#FindEvidence+1] = {opthead = Lang:t('evidence.examine_menu_fingerprint_b'),optdesc = Lang:t('evidence.examine_menu_fingerprint_h'), opticon = 'fingerprint',
+        optparams = {
+            event = 'police:client:SelectEvidence',
+            args = {type = 'fingerprint', label = 'Fingerprint', icon = 'fingerprint',}
+        }}
+    FindEvidence[#FindEvidence+1] = {opthead = Lang:t('evidence.examine_menu_bullet_b'),optdesc = Lang:t('evidence.examine_menu_bullet_h'), opticon = 'joint',
+        optparams = {
+            event = 'police:client:SelectEvidence',
+            args = {type = 'bullet', label = 'Bullet', icon = 'joint',}
+        }}
+    FindEvidence[#FindEvidence+1] = {opthead = Lang:t('evidence.examine_menu_frags_b'),optdesc = Lang:t('evidence.examine_menu_frags_h'), opticon = 'car',
+        optparams = {
+            event = 'police:client:SelectEvidence',
+            args = {type = 'vehiclefragement', label = 'Vehicle Fragment', icon = 'car',}
+        }}         
+    FindEvidence[#FindEvidence+1] = {opthead = Lang:t('menu.close_x'), opticon = 'xmark', optparams = {event = ''}}
+
+    local header = {
+        disabled = true,
+        header = PlayerData.job.label,
+        headerid = 'police_evidencebags_menu', -- unique
+        desc = '',
+        icon = 'microscope'
+    }
+    ContextSystem.Open(header, FindEvidence)
+end)
+```
+- Place the following locales inside your locales folder make sure its in the evidence table(en.lua for example)
+```
+examine_menu_bullet_h = "Examine ammunition fragment",
+examine_menu_bullet_b = "Examine ammunition fragment",
+examine_menu_frags_h = "Examine vehicle fragment",
+examine_menu_frags_b = "Examine vehicle fragment",
+```
+
 # Features
 - Bullet casings as Evidence
 - Blood drop as Evidence
@@ -77,6 +129,7 @@ Config.AmmoLabels = {
 - Evidence can be checked via weapon_flashlight ( can be picked up )
 - Criminals can remove evidence
 - Also work when Player is using a Camera ( must be playing a specific animation )
+- By using the Laserpointer near a Bullethole u can see the DrawLines of each shoot
 - Evidence automatically removes after 45Min. (Performance thing)
 
 # Commands ( OPTIONAL )
@@ -90,6 +143,7 @@ Config.AmmoLabels = {
 # New Items
 - rag - Allows Criminals to delete nearby Evidence.
 - evidencecleaningkit - Allows Police Officers to remove evidence. ( No need for the commands then )
+- policepointer - Allows Police Officers to see the DrawLines.
 
 # Credits
 - [RazerGhost](https://github.com/RazerGhost)
