@@ -322,7 +322,7 @@ RegisterNetEvent('evidence:server:AddFingerprintToInventory', function(fingerId,
 end)
 
 -----------------------------------------[ CASINGS ]-----------------------------------------
-RegisterNetEvent('evidence:server:CreateCasing', function(weapon, coords, currentTime, pedcoords)
+RegisterNetEvent('evidence:server:CreateCasing', function(weapon, coords, currentTime)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     local casingId = CreateCasingId()
@@ -336,7 +336,7 @@ RegisterNetEvent('evidence:server:CreateCasing', function(weapon, coords, curren
             end
         end
     end
-    TriggerClientEvent('evidence:client:AddCasing', -1, casingId, weapon, coords, serieNumber, currentTime, pedcoords)
+    TriggerClientEvent('evidence:client:AddCasing', -1, casingId, weapon, coords, serieNumber, currentTime)
 end)
 
 RegisterNetEvent('evidence:server:ClearCasings', function(casingList)
