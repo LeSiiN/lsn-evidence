@@ -822,9 +822,6 @@ if Config.PoliceJob == "hi-dev" then
                                 local raycastdist = #(coords - vector3(v.coords.x, v.coords.y, v.coords.z))
                                 if dist < 20 then
                                     CurrentBullethole = k
-                                    if Config.ShowShootersLine then
-                                        DrawLine(v.coords.x, v.coords.y, v.coords.z -0.05, v.pedcoord.x, v.pedcoord.y, v.pedcoord.z, v.drawLine_r, v.drawLine_g, v.drawLine_b, 255)
-                                    end
                                     if pos.z < v.coords.z then
                                         DrawMarker(6, v.coords.x, v.coords.y, v.coords.z -0.05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.5, 0.1, Config.BulletholeMarkerRGBA.r, Config.BulletholeMarkerRGBA.g, Config.BulletholeMarkerRGBA.b, Config.BulletholeMarkerRGBA.a, false, true, 2, nil, nil, false)
                                     else
@@ -864,9 +861,6 @@ if Config.PoliceJob == "hi-dev" then
                                 local raycastdist = #(coords - vector3(v.coords.x, v.coords.y, v.coords.z))
                                 if dist < 20 then
                                     CurrentVehicleFragement = k
-                                    if Config.ShowShootersLine then
-                                        DrawLine(v.coords.x, v.coords.y, v.coords.z -0.05, v.pedcoord.x, v.pedcoord.y, v.pedcoord.z, v.drawLine_r, v.drawLine_g, v.drawLine_b, 255)
-                                    end
                                     if GetEntityType(entityHit) then
                                         if dist < 7.5 and dist > 1.5 then
                                             DrawText3D(v.coords.x, v.coords.y, v.coords.z +0.05, Lang:t('info.vehicle_fragement'))
