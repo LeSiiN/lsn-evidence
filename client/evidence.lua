@@ -22,6 +22,7 @@ local currentTime = 0
 local r, g, b = 0, 0, 0
 
 local drawLine_r, drawLine_g, drawLine_b = 0, 0, 0
+local FingerprintsList = {}
 
 local WhitelistedWeapons = {
     `weapon_unarmed`,
@@ -115,6 +116,16 @@ local function RayCastGamePlayCamera(distance)
 	return hit == 1, endCoords, entityHit
 end
 
+local function DrawLineDisableNotify()
+    if Config.Notify == "qb" then
+        QBCore.Functions.Notify(Lang:t('error.drawLine_disabled'), 'error') 
+    elseif Config.Notify == "ox" then
+        lib.notify({ title = 'Evidence', description = Lang:t('error.error.drawLine_disabled'), duration = 5000, type = 'error' })
+    else
+        print(Lang:t('error.config_error'))
+    end
+end
+
 ------------------------------------------------------------------------------[ EVENTS ]------------------------------------------------------------------------------
 AddEventHandler('onResourceStart', function(resourceName)
     if GetCurrentResourceName() == resourceName then
@@ -130,6 +141,7 @@ end)
 
 RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
     PlayerJob = {}
+    FingerprintsList = {}
 end)
 
 RegisterNetEvent('QBCore:Client:SetDuty', function(newDuty)
@@ -696,7 +708,7 @@ CreateThread(function()
         Wait(5)
         if LocalPlayer.state.isLoggedIn then
             if PlayerJob.type == 'leo' and PlayerJob.onduty then
-                if (IsPlayerFreeAiming(PlayerId()) and GetSelectedPedWeapon(PlayerPedId()) == `WEAPON_FLASHLIGHT`) or IsEntityPlayingAnim(PlayerPedId(), "amb@world_human_tourist_map@male@base", "base", 3) then
+                if (IsPlayerFreeAiming(PlayerId()) and GetSelectedPedWeapon(PlayerPedId()) == `WEAPON_FLASHLIGHT`) or IsEntityPlayingAnim(PlayerPedId(), "amb@world_human_paparazzi@male@base", "base", 3) then
                     local pos = GetEntityCoords(PlayerPedId(), true)
                     local hit, coords = RayCastGamePlayCamera(1000.0)
                     if next(Casings) then
@@ -723,8 +735,10 @@ CreateThread(function()
                                             type = 'casing',
                                             street = streetLabel:gsub("%'", ''),
                                             ammolabel = Config.AmmoLabels[QBCore.Shared.Weapons[Casings[CurrentCasing].type]['ammotype']],
-                                            ammotype = Casings[CurrentCasing].type,
-                                            serie = Casings[CurrentCasing].serie
+                                            ammotype = Lang:t('info.unknown'),
+                                            ammotype2 = Casings[CurrentCasing].type,
+                                            serie = Lang:t('info.unknown'),
+                                            serie2 = Casings[CurrentCasing].serie
                                         }
                                         TriggerServerEvent('evidence:server:AddCasingToInventory', CurrentCasing, info)
                                     end
@@ -756,8 +770,10 @@ CreateThread(function()
                                             label = Lang:t('info.blood'),
                                             type = 'blood',
                                             street = streetLabel:gsub("%'", ''),
-                                            dnalabel = DnaHash(Blooddrops[CurrentBlooddrop].citizenid),
-                                            bloodtype = Blooddrops[CurrentBlooddrop].bloodtype
+                                            dnalabel = Lang:t('info.unknown'),
+                                            dnalabel2 = DnaHash(Blooddrops[CurrentBlooddrop].citizenid),
+                                            bloodtype2 = Lang:t('info.unknown'),
+                                            bloodtype2 = Blooddrops[CurrentBlooddrop].bloodtype
                                         }
                                         TriggerServerEvent('evidence:server:AddBlooddropToInventory', CurrentBlooddrop, info)
                                     end
@@ -789,7 +805,8 @@ CreateThread(function()
                                             label = Lang:t('info.fingerprint'),
                                             type = 'fingerprint',
                                             street = streetLabel:gsub("%'", ''),
-                                            fingerprint = Fingerprints[CurrentFingerprint].fingerprint
+                                            fingerprint = Lang:t('info.unknown'),
+                                            fingerprint2 = Fingerprints[CurrentFingerprint].fingerprint
                                         }
                                         TriggerServerEvent('evidence:server:AddFingerprintToInventory', CurrentFingerprint, info)
                                     end
@@ -827,8 +844,11 @@ CreateThread(function()
                                             type = 'bullet',
                                             street = streetLabel:gsub("%'", ''),
                                             ammolabel = Config.AmmoLabels[QBCore.Shared.Weapons[Casings[CurrentCasing].type]['ammotype']],
-                                            ammotype = Bullethole[CurrentBullethole].type,
-                                            serie = Bullethole[CurrentBullethole].serie
+                                            ammotype = Lang:t('info.unknown'),
+                                            ammotype2 = Bullethole[CurrentBullethole].type,
+                                            serie = Lang:t('info.unknown'),
+                                            serie2 = Bullethole[CurrentBullethole].serie
+
                                         }
                                         TriggerServerEvent('evidence:server:AddBulletToInventory', CurrentBullethole, info)
                                     end
@@ -866,9 +886,12 @@ CreateThread(function()
                                             label = Lang:t('info.bullet'),
                                             type = 'vehiclefragement',
                                             street = streetLabel:gsub("%'", ''),
-                                            rgb = "R: " ..v.r.. " / G: " ..v.g.. " / B: " ..v.b,
-                                            ammotype = Fragements[CurrentVehicleFragement].type,
-                                            serie = Fragements[CurrentVehicleFragement].serie
+                                            rgb = Lang:t('info.unknown'),
+                                            rgb2 = "R: " ..v.r.. " / G: " ..v.g.. " / B: " ..v.b,
+                                            ammotype = Lang:t('info.unknown'),
+                                            ammotype2 = Fragements[CurrentVehicleFragement].type,
+                                            serie = Lang:t('info.unknown'),
+                                            serie2 = Fragements[CurrentVehicleFragement].serie,
                                         }
                                         TriggerServerEvent('evidence:server:AddFragementToInventory', CurrentVehicleFragement, info)
                                     end
@@ -884,4 +907,81 @@ CreateThread(function()
             end
         end
     end
+end)
+------------------------------------------------------------------------------[ toggleDrawLine Stuff ( Credits to ByBlackDeath ) ]------------------------------------------------------------------------------
+local toggleDrawLine = false
+
+RegisterNetEvent('evidence:client:toggleDrawLine', function()
+    toggleDrawLine = not toggleDrawLine
+
+    if toggleDrawLine then 
+        if Config.Notify == "qb" then
+            QBCore.Functions.Notify(Lang:t('error.drawLine_enabled'), 'success') 
+        elseif Config.Notify == "ox" then
+            lib.notify({ title = 'Evidence', description = Lang:t('error.error.drawLine_drawLine_enabled'), duration = 5000, type = 'success' })
+        else
+            print(Lang:t('error.config_error'))
+        end
+    else
+        DrawLineDisableNotify()
+    end
+
+    CreateThread(function()
+        while toggleDrawLine do
+            Wait(5)
+            if LocalPlayer.state.isLoggedIn then
+                if PlayerJob.type == 'leo' and PlayerJob.onduty then
+                    local selectedWeapon = GetSelectedPedWeapon(PlayerPedId())
+                    if selectedWeapon ~= GetHashKey('weapon_unarmed') then
+                        if selectedWeapon ~= GetHashKey('weapon_flashlight') then
+                            if Config.Notify == "qb" then
+                                QBCore.Functions.Notify(Lang:t('error.drawLine_weapon_in_hand'), 'error') 
+                            elseif Config.Notify == "ox" then
+                                lib.notify({ title = 'Evidence', description = Lang:t('error.error.drawLine_weapon_in_hand'), duration = 5000, type = 'error' })
+                            else
+                                print(Lang:t('error.config_error'))
+                            end
+                            
+                            toggleDrawLine = false
+                            break
+                        end
+                    end
+                    if next(Bullethole) then
+                        local pos = GetEntityCoords(PlayerPedId(), true)
+                        for k, v in pairs(Bullethole) do
+                            local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
+                            if dist < 20 then
+                                CurrentBullethole = k
+                                DrawLine(v.coords.x, v.coords.y, v.coords.z -0.05, v.pedcoord.x, v.pedcoord.y, v.pedcoord.z, v.drawLine_r, v.drawLine_g, v.drawLine_b, 255)
+                            elseif dist > 20 then
+                                if Config.Notify == "qb" then
+                                    QBCore.Functions.Notify(Lang:t('error.drawLine_too_far_away'), 'error') 
+                                elseif Config.Notify == "ox" then
+                                    lib.notify({ title = 'Evidence', description = Lang:t('error.error.drawLine_too_far_away'), duration = 5000, type = 'error' })
+                                else
+                                    print(Lang:t('error.config_error'))
+                                end
+                                toggleDrawLine = false
+                                break
+                            end
+                        end
+                    end
+                    if next(Fragements) then
+                        local pos = GetEntityCoords(PlayerPedId(), true)
+                        for k, v in pairs(Fragements) do
+                            local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
+                            if dist < 20 then
+                                CurrentVehicleFragement = k
+                                DrawLine(v.coords.x, v.coords.y, v.coords.z -0.05, v.pedcoord.x, v.pedcoord.y, v.pedcoord.z, v.drawLine_r, v.drawLine_g, v.drawLine_b, 255)
+                            end
+                        end
+                    end
+                else
+                    DrawLineDisableNotify()
+                    toggleDrawLine = false
+                    break
+                end
+            end
+        end
+    end)
 end)

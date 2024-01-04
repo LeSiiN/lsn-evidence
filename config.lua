@@ -1,6 +1,6 @@
 Config = {}
 
----------[ If TRUE it shows the Line from where the Shooter shoot the bullet DEFAULT = RED ]---------
+---------[ If TRUE it shows the Line from where the Shooter shoot the bullet DEFAULT = RED (Deactivates the Laserpointer) ]---------
 Config.ShowShootersLine = true
 
 ---------[ If TRUE Police will create evidence aswell ]---------
