@@ -1,6 +1,5 @@
 local Translations = {
     error = {
-        have_evidence_bag = 'You need an evidence bag to take the evidence',
         blood_not_cleared = 'Blood NOT cleared',
         bullet_casing_not_removed = 'Bullet Casings NOT Removed',
         bullet_hole_not_removed = 'Bullet Holes NOT Removed',
