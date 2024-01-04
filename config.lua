@@ -13,6 +13,9 @@ Config.Commands = true
 ---------[ "qb" for qb-core Notify    or    "ox" for ox_lib Notify ]---------
 Config.Notify = "qb"
 
+---------[ "qb" for default qb-policejob    or    "hi-dev" for hi-dev qb-policejob ]---------
+Config.PoliceJob = "qb"
+
 -- SOON -- Config.Inventory = "qb" -- "qb" for qb/ps/lj-inventory    or    "ox" for ox_inventory
 
 ---------[ Sets the MINUTES of how long Evidence should be visible. After this time, evidence will be removed one by one. DEFAULT: 45 Min ]---------
