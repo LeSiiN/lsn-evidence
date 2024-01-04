@@ -710,7 +710,7 @@ CreateThread(function()
         Wait(5)
         if LocalPlayer.state.isLoggedIn then
             if PlayerJob.type == 'leo' and PlayerJob.onduty then
-                if (IsPlayerFreeAiming(PlayerId()) and GetSelectedPedWeapon(PlayerPedId()) == `WEAPON_FLASHLIGHT`) or IsEntityPlayingAnim(PlayerPedId(), "amb@world_human_tourist_map@male@base", "base", 3) then
+                if (IsPlayerFreeAiming(PlayerId()) and GetSelectedPedWeapon(PlayerPedId()) == `WEAPON_FLASHLIGHT`) or IsEntityPlayingAnim(PlayerPedId(), "amb@world_human_paparazzi@male@base", "base", 3) then
                     local pos = GetEntityCoords(PlayerPedId(), true)
                     local hit, coords = RayCastGamePlayCamera(1000.0)
                     if next(Casings) then
