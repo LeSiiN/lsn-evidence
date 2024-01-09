@@ -272,7 +272,9 @@ RegisterNetEvent('evidence:server:AddBlooddropToInventory', function(bloodId, bl
             info.type = bloodInfo.type
             info.street = bloodInfo.street
             info.dnalabel = bloodInfo.dnalabel
+            info.dnalabel2 = bloodInfo.dnalabel2
             info.bloodtype = bloodInfo.bloodtype
+            info.bloodtype2 = bloodInfo.bloodtype2
             if exports.ox_inventory:CanCarryItem(src, 'filled_evidence_bag', 1) then
                 exports.ox_inventory:AddItem(src, 'filled_evidence_bag', 1, info)
             end
@@ -325,6 +327,7 @@ RegisterNetEvent('evidence:server:AddFingerprintToInventory', function(fingerId,
             info.type = fingerInfo.type
             info.street = fingerInfo.street
             info.serie = fingerInfo.fingerprint
+            info.serie2 = fingerInfo.fingerprint2
             if exports.ox_inventory:CanCarryItem(src, 'filled_evidence_bag', 1) then
                 exports.ox_inventory:AddItem(src, 'filled_evidence_bag', 1, info)
             end
@@ -396,7 +399,9 @@ RegisterNetEvent('evidence:server:AddCasingToInventory', function(casingId, casi
             info.street = casingInfo.street
             info.ammolabel = casingInfo.ammolabel
             info.ammotype = casingInfo.ammotype
+            info.ammotype2 = casingInfo.ammotype2
             info.serie = casingInfo.serie
+            info.serie2 = casingInfo.serie2
             if exports.ox_inventory:CanCarryItem(src, 'filled_evidence_bag', 1) then
                 exports.ox_inventory:AddItem(src, 'filled_evidence_bag', 1, info)
             end
@@ -467,7 +472,10 @@ RegisterNetEvent('evidence:server:AddBulletToInventory', function(bulletholeId, 
             info.type = bulletInfo.type
             info.street = bulletInfo.street
             info.ammolabel = bulletInfo.ammolabel
+            info.ammotype = bulletInfo.ammotype
+            info.ammotype2 = bulletInfo.ammotype2
             info.serie = bulletInfo.serie
+            info.serie2 = bulletInfo.serie2
             if exports.ox_inventory:CanCarryItem(src, 'filled_evidence_bag', 1) then
                 exports.ox_inventory:AddItem(src, 'filled_evidence_bag', 1, info)
             end
@@ -538,8 +546,11 @@ RegisterNetEvent('evidence:server:AddFragementToInventory', function(vehiclefrag
             info.type = fragementInfo.type
             info.street = fragementInfo.street
             info.rgb = fragementInfo.rgb
+            info.rgb2 = fragementInfo.rgb2
             info.ammotype = fragementInfo.ammotype
+            info.ammotype2 = fragementInfo.ammotype2
             info.serie = fragementInfo.serie
+            info.serie2 = fragementInfo.serie2
             if exports.ox_inventory:CanCarryItem(src, 'filled_evidence_bag', 1) then
                 exports.ox_inventory:AddItem(src, 'filled_evidence_bag', 1, info)
             end

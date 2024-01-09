@@ -118,7 +118,7 @@ end
 
 local function DrawLineDisableNotify()
     if Config.Notify == "qb" then
-        QBCore.Functions.Notify(Lang:t('error.drawLine_disabled'), 'error') 
+        QBCore.Functions.Notify(Lang:t('error.drawLine_disabled'), 'error')
     elseif Config.Notify == "ox" then
         lib.notify({ title = 'Evidence', description = Lang:t('error.error.drawLine_disabled'), duration = 5000, type = 'error' })
     else
@@ -787,7 +787,7 @@ if Config.PoliceJob == "hi-dev" then
                                                 street = streetLabel:gsub("%'", ''),
                                                 dnalabel = Lang:t('info.unknown'),
                                                 dnalabel2 = DnaHash(Blooddrops[CurrentBlooddrop].citizenid),
-                                                bloodtype2 = Lang:t('info.unknown'),
+                                                bloodtype = Lang:t('info.unknown'),
                                                 bloodtype2 = Blooddrops[CurrentBlooddrop].bloodtype
                                             }
                                             TriggerServerEvent('evidence:server:AddBlooddropToInventory', CurrentBlooddrop, info)
@@ -1114,9 +1114,9 @@ local toggleDrawLine = false
 RegisterNetEvent('evidence:client:toggleDrawLine', function()
     toggleDrawLine = not toggleDrawLine
 
-    if toggleDrawLine then 
+    if toggleDrawLine then
         if Config.Notify == "qb" then
-            QBCore.Functions.Notify(Lang:t('error.drawLine_enabled'), 'success') 
+            QBCore.Functions.Notify(Lang:t('error.drawLine_enabled'), 'success')
         elseif Config.Notify == "ox" then
             lib.notify({ title = 'Evidence', description = Lang:t('error.error.drawLine_drawLine_enabled'), duration = 5000, type = 'success' })
         else
@@ -1135,13 +1135,13 @@ RegisterNetEvent('evidence:client:toggleDrawLine', function()
                     if selectedWeapon ~= GetHashKey('weapon_unarmed') then
                         if selectedWeapon ~= GetHashKey('weapon_flashlight') then
                             if Config.Notify == "qb" then
-                                QBCore.Functions.Notify(Lang:t('error.drawLine_weapon_in_hand'), 'error') 
+                                QBCore.Functions.Notify(Lang:t('error.drawLine_weapon_in_hand'), 'error')
                             elseif Config.Notify == "ox" then
                                 lib.notify({ title = 'Evidence', description = Lang:t('error.error.drawLine_weapon_in_hand'), duration = 5000, type = 'error' })
                             else
                                 print(Lang:t('error.config_error'))
                             end
-                            
+
                             toggleDrawLine = false
                             break
                         end
@@ -1155,7 +1155,7 @@ RegisterNetEvent('evidence:client:toggleDrawLine', function()
                                 DrawLine(v.coords.x, v.coords.y, v.coords.z -0.05, v.pedcoord.x, v.pedcoord.y, v.pedcoord.z, v.drawLine_r, v.drawLine_g, v.drawLine_b, 255)
                             elseif dist > 20 then
                                 if Config.Notify == "qb" then
-                                    QBCore.Functions.Notify(Lang:t('error.drawLine_too_far_away'), 'error') 
+                                    QBCore.Functions.Notify(Lang:t('error.drawLine_too_far_away'), 'error')
                                 elseif Config.Notify == "ox" then
                                     lib.notify({ title = 'Evidence', description = Lang:t('error.error.drawLine_too_far_away'), duration = 5000, type = 'error' })
                                 else

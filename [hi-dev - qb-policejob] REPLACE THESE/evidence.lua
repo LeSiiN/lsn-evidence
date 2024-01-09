@@ -54,6 +54,46 @@ RegisterNetEvent('evidence:client:SetStatus', function(statusId, time)
     TriggerServerEvent('evidence:server:UpdateStatus', CurrentStatusList)
 end)
 
+RegisterNetEvent('police:client:SelectEvidence', function(Data)
+    QBCore.Debug(Data)
+    QBCore.Functions.TriggerCallback('police:server:GetEvidenceByType', function(List)
+        if List == nil then
+            QBCore.Functions.Notify(Lang:t('error.dont_have_evidence_bag'), 'error')
+        else
+            local EvidenceBagsMenu = {}
+
+            for _, n in pairs(List) do
+                EvidenceBagsMenu[#EvidenceBagsMenu+1] = {opthead = n.label, optdesc = Lang:t('info.select_for_examine_b', {street = n.metadata.street, label= n.metadata.label, slot=n.slot}), opticon = 'caret-right',
+                    optparams  = {
+                        event = 'police:client:ExamineEvidenceBag',
+                        args = {Item = n,slot = n.slot}
+                    }}
+            end
+
+            EvidenceBagsMenu[#EvidenceBagsMenu+1] = {opthead = Lang:t('menu.close_x'),opticon = 'fa-solid fa-xmark', optparams= {event=''}}
+            local header = {
+                disabled = true,
+                header = Data.label..' evidences',
+                headerid = 'police_evidencebags_menu', -- unique
+                desc = '',
+                icon = Data.icon
+            }
+            ContextSystem.Open(header, EvidenceBagsMenu)
+        end
+    end, Data.type)
+end)
+
+RegisterNetEvent('police:client:ExamineEvidenceBag', function(Data)
+    QBCore.Functions.Progressbar('examine_evidence_bag', Lang:t('progressbar.examining', {label = Data.Item.metadata.label}), 5000, false, false, {
+        disableMovement = true,
+        disableCarMovement = false,
+        disableMouse = false,
+        disableCombat = true
+    }, {}, {}, {}, function() -- Done
+        TriggerServerEvent('police:server:UpdateEvidenceBag', Data.Item, Data.slot)
+    end, function() end)
+end)
+
 -- Threads
 CreateThread(function()
     while true do
