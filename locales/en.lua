@@ -8,6 +8,11 @@ local Translations = {
         config_error = 'LSN-EVIDENCE: Something is wrong in the Config',
         no_player = 'No Player in reach!',
         have_evidence_bag = 'You must have an empty evidence bag with you',
+        plate_nil = 'Plate is nil!',
+        drawLine_disabled = 'Laserpointer was removed!',
+        drawLine_enabled = 'Laserpointer was activated!',
+        drawLine_weapon_in_hand = 'Not while carrying a Weapon!',
+        drawLine_too_far_away = 'No Casings nearby!',
     },
     success = {
         blood_clear = 'Blood Cleared',
@@ -27,6 +32,7 @@ local Translations = {
         vehicle_fragement = 'Vehicle Fragement',
         fingerprint = 'Fingerprint',
         player_id = 'ID of Player',
+        unknown = 'Unknown',
     },
     evidence = {
         serial_not_visible = 'Serial number not visible...',

@@ -1211,8 +1211,15 @@ RegisterNetEvent('police:server:UpdateEvidenceBag', function(Item, Slot)
             Item.info.bloodtype = Item.info.bloodtype2
         elseif Item.info.type == 'fingerprint' then
             Item.info.fingerprint = Item.info.fingerprint2
+        elseif Item.info.type == 'bullet' then
+            Item.info.serie = Item.info.serie2
+            Item.info.ammotype = Item.info.ammotype2
+        elseif Item.info.type == 'vehiclefragement' then
+            Item.info.serie = Item.info.serie2
+            Item.info.ammotype = Item.info.ammotype2 
+            Item.info.rgb = Item.info.rgb2
         end
-    end
+    end     
 
     if Player.Functions.RemoveItem('filled_evidence_bag', 1, Slot) then
         Player.Functions.AddItem('filled_evidence_bag', 1, Slot, Item.info)

@@ -1,6 +1,6 @@
 Config = {}
 
----------[ If TRUE it shows the Line from where the Shooter shoot the bullet DEFAULT = RED ]---------
+---------[ If TRUE it shows the Line from where the Shooter shoot the bullet DEFAULT = RED (Deactivates the Laserpointer) ]---------
 Config.ShowShootersLine = true
 
 ---------[ If TRUE Police will create evidence aswell ]---------
@@ -12,6 +12,9 @@ Config.Commands = true
 
 ---------[ "qb" for qb-core Notify    or    "ox" for ox_lib Notify ]---------
 Config.Notify = "qb"
+
+---------[ "qb" for default qb-policejob    or    "hi-dev" for hi-dev qb-policejob ]---------
+Config.PoliceJob = "qb"
 
 -- SOON -- Config.Inventory = "qb" -- "qb" for qb/ps/lj-inventory    or    "ox" for ox_inventory
 Config.Inventory = "ox"

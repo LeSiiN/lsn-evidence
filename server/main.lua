@@ -5,6 +5,7 @@ local Fragements = {}
 local BloodDrops = {}
 local FingerDrops = {}
 local QBCore = exports['qb-core']:GetCoreObject()
+local fingerprintsList = {}
 
 ------------------------------------------------------------------------------[ FUNCTIONS ]------------------------------------------------------------------------------
 local function CreateBloodId()
@@ -230,6 +231,14 @@ QBCore.Functions.CreateUseableItem("evidencecleaningkit", function(source)
     end
 end)
 
+if Config.ShowShootersLine then
+    QBCore.Functions.CreateUseableItem("policepointer", function(source)
+        local src = source
+        local Player = QBCore.Functions.GetPlayer(src)
+        if not Player then return end
+        TriggerClientEvent('evidence:client:toggleDrawLine', src)
+    end)
+end
 ------------------------------------------------------------------------------[ EVENTS ]------------------------------------------------------------------------------
 
 -----------------------------------------[ BLOOD ]-----------------------------------------

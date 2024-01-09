@@ -22,6 +22,7 @@ local currentTime = 0
 local r, g, b = 0, 0, 0
 
 local drawLine_r, drawLine_g, drawLine_b = 0, 0, 0
+local FingerprintsList = {}
 
 local WhitelistedWeapons = {
     `weapon_unarmed`,
@@ -115,6 +116,16 @@ local function RayCastGamePlayCamera(distance)
 	return hit == 1, endCoords, entityHit
 end
 
+local function DrawLineDisableNotify()
+    if Config.Notify == "qb" then
+        QBCore.Functions.Notify(Lang:t('error.drawLine_disabled'), 'error') 
+    elseif Config.Notify == "ox" then
+        lib.notify({ title = 'Evidence', description = Lang:t('error.error.drawLine_disabled'), duration = 5000, type = 'error' })
+    else
+        print(Lang:t('error.config_error'))
+    end
+end
+
 ------------------------------------------------------------------------------[ EVENTS ]------------------------------------------------------------------------------
 AddEventHandler('onResourceStart', function(resourceName)
     if GetCurrentResourceName() == resourceName then
@@ -144,6 +155,7 @@ end)
 
 RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
     PlayerJob = {}
+    FingerprintsList = {}
 end)
 
 RegisterNetEvent('QBCore:Client:SetDuty', function(newDuty)
@@ -705,185 +717,452 @@ CreateThread(function()
 end)
 
 -----------------------------------------[ CHECK WITH FLASHLIGHT OR CAMERA ]-----------------------------------------
-CreateThread(function()
-    while true do
-        Wait(5)
-        if LocalPlayer.state.isLoggedIn then
-            if PlayerJob.type == 'leo' and PlayerJob.onduty then
-                if (IsPlayerFreeAiming(PlayerId()) and GetSelectedPedWeapon(PlayerPedId()) == `WEAPON_FLASHLIGHT`) or IsEntityPlayingAnim(PlayerPedId(), "amb@world_human_paparazzi@male@base", "base", 3) then
-                    local pos = GetEntityCoords(PlayerPedId(), true)
-                    local hit, coords = RayCastGamePlayCamera(1000.0)
-                    if next(Casings) then
-                        for k, v in pairs(Casings) do
-                            local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
-                            local raycastdist = #(coords - vector3(v.coords.x, v.coords.y, v.coords.z))
-                            if dist < 20 then
-                                CurrentCasing = k
-                                DrawMarker(0, v.coords.x, v.coords.y, v.coords.z -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.15, 0.15, 0.1, Config.CasingMarkerRGBA.r, Config.CasingMarkerRGBA.g, Config.CasingMarkerRGBA.b, Config.CasingMarkerRGBA.a, false, false, false, true, false, false, false)
-                                if dist > 2.5 and dist < 10 then
-                                    DrawText3D(v.coords.x, v.coords.y, v.coords.z +0.1, " ~b~Bullet Casing [ " ..Config.AmmoLabels[QBCore.Shared.Weapons[Casings[CurrentCasing].type]['ammotype']].. " ]~s~")
-                                elseif raycastdist < 0.25 and dist < 5 then
-                                    DrawText3D(v.coords.x, v.coords.y, v.coords.z  -0.05, Lang:t('info.bullet_casing'))
-                                    if IsControlJustReleased(0, 23) then
-                                        local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
-                                        local street1 = GetStreetNameFromHashKey(s1)
-                                        local street2 = GetStreetNameFromHashKey(s2)
-                                        local streetLabel = street1
-                                        if street2 then
-                                            streetLabel = streetLabel .. ' | ' .. street2
-                                        end
-                                        local info = {
-                                            label = Lang:t('info.casing'),
-                                            type = 'casing',
-                                            street = streetLabel:gsub("%'", ''),
-                                            ammolabel = Config.AmmoLabels[QBCore.Shared.Weapons[Casings[CurrentCasing].type]['ammotype']],
-                                            ammotype = Casings[CurrentCasing].type,
-                                            serie = Casings[CurrentCasing].serie
-                                        }
-                                        TriggerServerEvent('evidence:server:AddCasingToInventory', CurrentCasing, info)
-                                        if Config.Inventory == "ox" then
-                                            exports.ox_inventory:displayMetadata({
-                                                label = 'Label',
-                                                type = 'Type',
-                                                street = 'Street',
-                                                ammolabel = 'Ammo Label',
-                                                ammotype = 'Ammo Type',
-                                                serie = 'Serial'
-                                            })
+if Config.PoliceJob == "hi-dev" then
+    CreateThread(function()
+        while true do
+            Wait(5)
+            if LocalPlayer.state.isLoggedIn then
+                if PlayerJob.type == 'leo' and PlayerJob.onduty then
+                    if (IsPlayerFreeAiming(PlayerId()) and GetSelectedPedWeapon(PlayerPedId()) == `WEAPON_FLASHLIGHT`) or IsEntityPlayingAnim(PlayerPedId(), "amb@world_human_paparazzi@male@base", "base", 3) then
+                        local pos = GetEntityCoords(PlayerPedId(), true)
+                        local hit, coords = RayCastGamePlayCamera(1000.0)
+                        if next(Casings) then
+                            for k, v in pairs(Casings) do
+                                local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
+                                local raycastdist = #(coords - vector3(v.coords.x, v.coords.y, v.coords.z))
+                                if dist < 20 then
+                                    CurrentCasing = k
+                                    DrawMarker(0, v.coords.x, v.coords.y, v.coords.z -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.15, 0.15, 0.1, Config.CasingMarkerRGBA.r, Config.CasingMarkerRGBA.g, Config.CasingMarkerRGBA.b, Config.CasingMarkerRGBA.a, false, false, false, true, false, false, false)
+                                    if dist > 2.5 and dist < 10 then
+                                        DrawText3D(v.coords.x, v.coords.y, v.coords.z +0.1, " ~b~Bullet Casing [ " ..Config.AmmoLabels[QBCore.Shared.Weapons[Casings[CurrentCasing].type]['ammotype']].. " ]~s~")
+                                    elseif raycastdist < 0.25 and dist < 5 then
+                                        DrawText3D(v.coords.x, v.coords.y, v.coords.z  -0.05, Lang:t('info.bullet_casing'))
+                                        if IsControlJustReleased(0, 23) then
+                                            local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
+                                            local street1 = GetStreetNameFromHashKey(s1)
+                                            local street2 = GetStreetNameFromHashKey(s2)
+                                            local streetLabel = street1
+                                            if street2 then
+                                                streetLabel = streetLabel .. ' | ' .. street2
+                                            end
+                                            local info = {
+                                                label = Lang:t('info.casing'),
+                                                type = 'casing',
+                                                street = streetLabel:gsub("%'", ''),
+                                                ammolabel = Config.AmmoLabels[QBCore.Shared.Weapons[Casings[CurrentCasing].type]['ammotype']],
+                                                ammotype = Lang:t('info.unknown'),
+                                                ammotype2 = Casings[CurrentCasing].type,
+                                                serie = Lang:t('info.unknown'),
+                                                serie2 = Casings[CurrentCasing].serie
+                                            }
+                                            TriggerServerEvent('evidence:server:AddCasingToInventory', CurrentCasing, info)
                                         end
                                     end
                                 end
                             end
                         end
-                    end
-                    if next(Blooddrops) then
-                        local pos = GetEntityCoords(PlayerPedId(), true)
-                        for k, v in pairs(Blooddrops) do
-                            local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
-                            local raycastdist = #(coords - vector3(v.coords.x, v.coords.y, v.coords.z))
-                            if dist < 20 then
-                                CurrentBlooddrop = k
-                                DrawMarker(0, v.coords.x, v.coords.y, v.coords.z -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.15, 0.15, 0.1, Config.BloodMarkerRGBA.r, Config.BloodMarkerRGBA.g, Config.BloodMarkerRGBA.b, Config.BloodMarkerRGBA.a, false, false, false, true, false, false, false)
-                                if dist > 2.5 and dist < 10 then
-                                    DrawText3D(v.coords.x, v.coords.y, v.coords.z +0.1, "~r~Blood [ "..DnaHash(Blooddrops[CurrentBlooddrop].citizenid).." ]~s~")
-                                elseif raycastdist < 0.25 and dist < 5 then
-                                    DrawText3D(v.coords.x, v.coords.y, v.coords.z -0.05, Lang:t('info.blood_text', { value = DnaHash(Blooddrops[CurrentBlooddrop].citizenid) }))
-                                    if IsControlJustReleased(0, 23) then
-                                        local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
-                                        local street1 = GetStreetNameFromHashKey(s1)
-                                        local street2 = GetStreetNameFromHashKey(s2)
-                                        local streetLabel = street1
-                                        if street2 then
-                                            streetLabel = streetLabel .. ' | ' .. street2
-                                        end
-                                        local info = {
-                                            label = Lang:t('info.blood'),
-                                            type = 'blood',
-                                            street = streetLabel:gsub("%'", ''),
-                                            dnalabel = DnaHash(Blooddrops[CurrentBlooddrop].citizenid),
-                                            bloodtype = Blooddrops[CurrentBlooddrop].bloodtype
-                                        }
-                                        TriggerServerEvent('evidence:server:AddBlooddropToInventory', CurrentBlooddrop, info)
-                                        if Config.Inventory == "ox" then
-                                            exports.ox_inventory:displayMetadata({
-                                                label = 'Label',
-                                                type = 'Type',
-                                                street = 'Street',
-                                                dnalabel = 'DNA',
-                                                bloodtype = 'Blood Type'
-                                            })
+                        if next(Blooddrops) then
+                            local pos = GetEntityCoords(PlayerPedId(), true)
+                            for k, v in pairs(Blooddrops) do
+                                local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
+                                local raycastdist = #(coords - vector3(v.coords.x, v.coords.y, v.coords.z))
+                                if dist < 20 then
+                                    CurrentBlooddrop = k
+                                    DrawMarker(0, v.coords.x, v.coords.y, v.coords.z -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.15, 0.15, 0.1, Config.BloodMarkerRGBA.r, Config.BloodMarkerRGBA.g, Config.BloodMarkerRGBA.b, Config.BloodMarkerRGBA.a, false, false, false, true, false, false, false)
+                                    if dist > 2.5 and dist < 10 then
+                                        DrawText3D(v.coords.x, v.coords.y, v.coords.z +0.1, "~r~Blood [ "..DnaHash(Blooddrops[CurrentBlooddrop].citizenid).." ]~s~")
+                                    elseif raycastdist < 0.25 and dist < 5 then
+                                        DrawText3D(v.coords.x, v.coords.y, v.coords.z -0.05, Lang:t('info.blood_text', { value = DnaHash(Blooddrops[CurrentBlooddrop].citizenid) }))
+                                        if IsControlJustReleased(0, 23) then
+                                            local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
+                                            local street1 = GetStreetNameFromHashKey(s1)
+                                            local street2 = GetStreetNameFromHashKey(s2)
+                                            local streetLabel = street1
+                                            if street2 then
+                                                streetLabel = streetLabel .. ' | ' .. street2
+                                            end
+                                            local info = {
+                                                label = Lang:t('info.blood'),
+                                                type = 'blood',
+                                                street = streetLabel:gsub("%'", ''),
+                                                dnalabel = Lang:t('info.unknown'),
+                                                dnalabel2 = DnaHash(Blooddrops[CurrentBlooddrop].citizenid),
+                                                bloodtype2 = Lang:t('info.unknown'),
+                                                bloodtype2 = Blooddrops[CurrentBlooddrop].bloodtype
+                                            }
+                                            TriggerServerEvent('evidence:server:AddBlooddropToInventory', CurrentBlooddrop, info)
                                         end
                                     end
                                 end
                             end
                         end
-                    end
-                    if next(Fingerprints) then
-                        local pos = GetEntityCoords(PlayerPedId(), true)
-                        for k, v in pairs(Fingerprints) do
-                            local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
-                            local raycastdist = #(coords - vector3(v.coords.x, v.coords.y, v.coords.z))
-                            if dist < 20 then
-                                CurrentFingerprint = k
-                                DrawMarker(0, v.coords.x, v.coords.y, v.coords.z -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.15, 0.15, 0.1, Config.FingerprintMarkerRGBA.r, Config.FingerprintMarkerRGBA.g, Config.FingerprintMarkerRGBA.b, Config.FingerprintMarkerRGBA.a, false, false, false, true, false, false, false)
-                                if dist > 2.5 and dist < 10 then
-                                    DrawText3D(v.coords.x, v.coords.y, v.coords.z +0.1, "~y~Fingerprint [ "..Fingerprints[CurrentFingerprint].fingerprint.." ]~s~")
-                                elseif raycastdist < 0.25 and dist < 5 then
-                                    DrawText3D(v.coords.x, v.coords.y, v.coords.z -0.05, Lang:t('info.fingerprint_text'))
-                                    if IsControlJustReleased(0, 23) then
-                                        local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
-                                        local street1 = GetStreetNameFromHashKey(s1)
-                                        local street2 = GetStreetNameFromHashKey(s2)
-                                        local streetLabel = street1
-                                        if street2 then
-                                            streetLabel = streetLabel .. ' | ' .. street2
-                                        end
-                                        local info = {
-                                            label = Lang:t('info.fingerprint'),
-                                            type = 'fingerprint',
-                                            street = streetLabel:gsub("%'", ''),
-                                            fingerprint = Fingerprints[CurrentFingerprint].fingerprint
-                                        }
-                                        TriggerServerEvent('evidence:server:AddFingerprintToInventory', CurrentFingerprint, info)
-                                        if Config.Inventory == "ox" then
-                                            exports.ox_inventory:displayMetadata({
-                                                label = 'Label',
-                                                type = 'Type',
-                                                street = 'Street',
-                                                fingerprint = 'Fingerprint'
-                                            })
+                        if next(Fingerprints) then
+                            local pos = GetEntityCoords(PlayerPedId(), true)
+                            for k, v in pairs(Fingerprints) do
+                                local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
+                                local raycastdist = #(coords - vector3(v.coords.x, v.coords.y, v.coords.z))
+                                if dist < 20 then
+                                    CurrentFingerprint = k
+                                    DrawMarker(0, v.coords.x, v.coords.y, v.coords.z -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.15, 0.15, 0.1, Config.FingerprintMarkerRGBA.r, Config.FingerprintMarkerRGBA.g, Config.FingerprintMarkerRGBA.b, Config.FingerprintMarkerRGBA.a, false, false, false, true, false, false, false)
+                                    if dist > 2.5 and dist < 10 then
+                                        DrawText3D(v.coords.x, v.coords.y, v.coords.z +0.1, "~y~Fingerprint [ "..Fingerprints[CurrentFingerprint].fingerprint.." ]~s~")
+                                    elseif raycastdist < 0.25 and dist < 5 then
+                                        DrawText3D(v.coords.x, v.coords.y, v.coords.z -0.05, Lang:t('info.fingerprint_text'))
+                                        if IsControlJustReleased(0, 23) then
+                                            local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
+                                            local street1 = GetStreetNameFromHashKey(s1)
+                                            local street2 = GetStreetNameFromHashKey(s2)
+                                            local streetLabel = street1
+                                            if street2 then
+                                                streetLabel = streetLabel .. ' | ' .. street2
+                                            end
+                                            local info = {
+                                                label = Lang:t('info.fingerprint'),
+                                                type = 'fingerprint',
+                                                street = streetLabel:gsub("%'", ''),
+                                                fingerprint = Lang:t('info.unknown'),
+                                                fingerprint2 = Fingerprints[CurrentFingerprint].fingerprint
+                                            }
+                                            TriggerServerEvent('evidence:server:AddFingerprintToInventory', CurrentFingerprint, info)
                                         end
                                     end
                                 end
                             end
+                        end
+                        if next(Bullethole) then
+                            local pos = GetEntityCoords(PlayerPedId(), true)
+                            for k, v in pairs(Bullethole) do
+                                local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
+                                local raycastdist = #(coords - vector3(v.coords.x, v.coords.y, v.coords.z))
+                                if dist < 20 then
+                                    CurrentBullethole = k
+                                    if pos.z < v.coords.z then
+                                        DrawMarker(6, v.coords.x, v.coords.y, v.coords.z -0.05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.5, 0.1, Config.BulletholeMarkerRGBA.r, Config.BulletholeMarkerRGBA.g, Config.BulletholeMarkerRGBA.b, Config.BulletholeMarkerRGBA.a, false, true, 2, nil, nil, false)
+                                    else
+                                        DrawMarker(0, v.coords.x, v.coords.y, v.coords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.15, 0.15, 0.1, Config.BulletholeMarkerRGBA.r, Config.BulletholeMarkerRGBA.g, Config.BulletholeMarkerRGBA.b, Config.BulletholeMarkerRGBA.a, false, true, 2, nil, nil, false)
+                                    end
+                                    if raycastdist < 0.25 and dist < 2.5 then
+                                        DrawText3D(v.coords.x, v.coords.y, v.coords.z  -0.05, Lang:t('info.bullet_casing'))
+                                        if IsControlJustReleased(0, 23) then
+                                            local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
+                                            local street1 = GetStreetNameFromHashKey(s1)
+                                            local street2 = GetStreetNameFromHashKey(s2)
+                                            local streetLabel = street1
+                                            if street2 then
+                                                streetLabel = streetLabel .. ' | ' .. street2
+                                            end
+                                            local info = {
+                                                label = Lang:t('info.bullet'),
+                                                type = 'bullet',
+                                                street = streetLabel:gsub("%'", ''),
+                                                ammolabel = Config.AmmoLabels[QBCore.Shared.Weapons[Casings[CurrentCasing].type]['ammotype']],
+                                                ammotype = Lang:t('info.unknown'),
+                                                ammotype2 = Bullethole[CurrentBullethole].type,
+                                                serie = Lang:t('info.unknown'),
+                                                serie2 = Bullethole[CurrentBullethole].serie
+
+                                            }
+                                            TriggerServerEvent('evidence:server:AddBulletToInventory', CurrentBullethole, info)
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                        if next(Fragements) then
+                            local pos = GetEntityCoords(PlayerPedId(), true)
+                            for k, v in pairs(Fragements) do
+                                local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
+                                local raycastdist = #(coords - vector3(v.coords.x, v.coords.y, v.coords.z))
+                                if dist < 20 then
+                                    CurrentVehicleFragement = k
+                                    if GetEntityType(entityHit) then
+                                        if dist < 7.5 and dist > 1.5 then
+                                            DrawText3D(v.coords.x, v.coords.y, v.coords.z +0.05, Lang:t('info.vehicle_fragement'))
+                                        end
+                                        DrawMarker(36, v.coords.x, v.coords.y, v.coords.z -0.05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.3, 0.2, v.r, v.g, v.b, 220, false, true, 2, nil, nil, false)
+                                    end
+                                    if dist < 1.5 then
+                                        DrawText3D(v.coords.x, v.coords.y, v.coords.z  -0.05, Lang:t('info.bullet_casing'))
+                                        if IsControlJustReleased(0, 23) then
+                                            local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
+                                            local street1 = GetStreetNameFromHashKey(s1)
+                                            local street2 = GetStreetNameFromHashKey(s2)
+                                            local streetLabel = street1
+                                            if street2 then
+                                                streetLabel = streetLabel .. ' | ' .. street2
+                                            end
+                                            local info = {
+                                                label = Lang:t('info.bullet'),
+                                                type = 'vehiclefragement',
+                                                street = streetLabel:gsub("%'", ''),
+                                                rgb = Lang:t('info.unknown'),
+                                                rgb2 = "R: " ..v.r.. " / G: " ..v.g.. " / B: " ..v.b,
+                                                ammotype = Lang:t('info.unknown'),
+                                                ammotype2 = Fragements[CurrentVehicleFragement].type,
+                                                serie = Lang:t('info.unknown'),
+                                                serie2 = Fragements[CurrentVehicleFragement].serie,
+                                            }
+                                            TriggerServerEvent('evidence:server:AddFragementToInventory', CurrentVehicleFragement, info)
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    else
+                        Wait(1000)
+                    end
+                else
+                    Wait(5000)
+                end
+            end
+        end
+    end)
+elseif Config.PoliceJob == "qb" then
+    CreateThread(function()
+        while true do
+            Wait(5)
+            if LocalPlayer.state.isLoggedIn then
+                if PlayerJob.type == 'leo' and PlayerJob.onduty then
+                    if (IsPlayerFreeAiming(PlayerId()) and GetSelectedPedWeapon(PlayerPedId()) == `WEAPON_FLASHLIGHT`) or IsEntityPlayingAnim(PlayerPedId(), "amb@world_human_paparazzi@male@base", "base", 3) then
+                        local pos = GetEntityCoords(PlayerPedId(), true)
+                        local hit, coords = RayCastGamePlayCamera(1000.0)
+                        if next(Casings) then
+                            for k, v in pairs(Casings) do
+                                local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
+                                local raycastdist = #(coords - vector3(v.coords.x, v.coords.y, v.coords.z))
+                                if dist < 20 then
+                                    CurrentCasing = k
+                                    DrawMarker(0, v.coords.x, v.coords.y, v.coords.z -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.15, 0.15, 0.1, Config.CasingMarkerRGBA.r, Config.CasingMarkerRGBA.g, Config.CasingMarkerRGBA.b, Config.CasingMarkerRGBA.a, false, false, false, true, false, false, false)
+                                    if dist > 2.5 and dist < 10 then
+                                        DrawText3D(v.coords.x, v.coords.y, v.coords.z +0.1, " ~b~Bullet Casing [ " ..Config.AmmoLabels[QBCore.Shared.Weapons[Casings[CurrentCasing].type]['ammotype']].. " ]~s~")
+                                    elseif raycastdist < 0.25 and dist < 5 then
+                                        DrawText3D(v.coords.x, v.coords.y, v.coords.z  -0.05, Lang:t('info.bullet_casing'))
+                                        if IsControlJustReleased(0, 23) then
+                                            local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
+                                            local street1 = GetStreetNameFromHashKey(s1)
+                                            local street2 = GetStreetNameFromHashKey(s2)
+                                            local streetLabel = street1
+                                            if street2 then
+                                                streetLabel = streetLabel .. ' | ' .. street2
+                                            end
+                                            local info = {
+                                                label = Lang:t('info.casing'),
+                                                type = 'casing',
+                                                street = streetLabel:gsub("%'", ''),
+                                                ammolabel = Config.AmmoLabels[QBCore.Shared.Weapons[Casings[CurrentCasing].type]['ammotype']],
+                                                ammotype = Casings[CurrentCasing].type,
+                                                serie = Casings[CurrentCasing].serie
+                                            }
+                                            TriggerServerEvent('evidence:server:AddCasingToInventory', CurrentCasing, info)
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                        if next(Blooddrops) then
+                            local pos = GetEntityCoords(PlayerPedId(), true)
+                            for k, v in pairs(Blooddrops) do
+                                local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
+                                local raycastdist = #(coords - vector3(v.coords.x, v.coords.y, v.coords.z))
+                                if dist < 20 then
+                                    CurrentBlooddrop = k
+                                    DrawMarker(0, v.coords.x, v.coords.y, v.coords.z -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.15, 0.15, 0.1, Config.BloodMarkerRGBA.r, Config.BloodMarkerRGBA.g, Config.BloodMarkerRGBA.b, Config.BloodMarkerRGBA.a, false, false, false, true, false, false, false)
+                                    if dist > 2.5 and dist < 10 then
+                                        DrawText3D(v.coords.x, v.coords.y, v.coords.z +0.1, "~r~Blood [ "..DnaHash(Blooddrops[CurrentBlooddrop].citizenid).." ]~s~")
+                                    elseif raycastdist < 0.25 and dist < 5 then
+                                        DrawText3D(v.coords.x, v.coords.y, v.coords.z -0.05, Lang:t('info.blood_text', { value = DnaHash(Blooddrops[CurrentBlooddrop].citizenid) }))
+                                        if IsControlJustReleased(0, 23) then
+                                            local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
+                                            local street1 = GetStreetNameFromHashKey(s1)
+                                            local street2 = GetStreetNameFromHashKey(s2)
+                                            local streetLabel = street1
+                                            if street2 then
+                                                streetLabel = streetLabel .. ' | ' .. street2
+                                            end
+                                            local info = {
+                                                label = Lang:t('info.blood'),
+                                                type = 'blood',
+                                                street = streetLabel:gsub("%'", ''),
+                                                dnalabel = DnaHash(Blooddrops[CurrentBlooddrop].citizenid),
+                                                bloodtype = Blooddrops[CurrentBlooddrop].bloodtype
+                                            }
+                                            TriggerServerEvent('evidence:server:AddBlooddropToInventory', CurrentBlooddrop, info)
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                        if next(Fingerprints) then
+                            local pos = GetEntityCoords(PlayerPedId(), true)
+                            for k, v in pairs(Fingerprints) do
+                                local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
+                                local raycastdist = #(coords - vector3(v.coords.x, v.coords.y, v.coords.z))
+                                if dist < 20 then
+                                    CurrentFingerprint = k
+                                    DrawMarker(0, v.coords.x, v.coords.y, v.coords.z -0.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.15, 0.15, 0.1, Config.FingerprintMarkerRGBA.r, Config.FingerprintMarkerRGBA.g, Config.FingerprintMarkerRGBA.b, Config.FingerprintMarkerRGBA.a, false, false, false, true, false, false, false)
+                                    if dist > 2.5 and dist < 10 then
+                                        DrawText3D(v.coords.x, v.coords.y, v.coords.z +0.1, "~y~Fingerprint [ "..Fingerprints[CurrentFingerprint].fingerprint.." ]~s~")
+                                    elseif raycastdist < 0.25 and dist < 5 then
+                                        DrawText3D(v.coords.x, v.coords.y, v.coords.z -0.05, Lang:t('info.fingerprint_text'))
+                                        if IsControlJustReleased(0, 23) then
+                                            local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
+                                            local street1 = GetStreetNameFromHashKey(s1)
+                                            local street2 = GetStreetNameFromHashKey(s2)
+                                            local streetLabel = street1
+                                            if street2 then
+                                                streetLabel = streetLabel .. ' | ' .. street2
+                                            end
+                                            local info = {
+                                                label = Lang:t('info.fingerprint'),
+                                                type = 'fingerprint',
+                                                street = streetLabel:gsub("%'", ''),
+                                                fingerprint = Fingerprints[CurrentFingerprint].fingerprint
+                                            }
+                                            TriggerServerEvent('evidence:server:AddFingerprintToInventory', CurrentFingerprint, info)
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                        if next(Bullethole) then
+                            local pos = GetEntityCoords(PlayerPedId(), true)
+                            for k, v in pairs(Bullethole) do
+                                local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
+                                local raycastdist = #(coords - vector3(v.coords.x, v.coords.y, v.coords.z))
+                                if dist < 20 then
+                                    CurrentBullethole = k
+                                    if pos.z < v.coords.z then
+                                        DrawMarker(6, v.coords.x, v.coords.y, v.coords.z -0.05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.5, 0.1, Config.BulletholeMarkerRGBA.r, Config.BulletholeMarkerRGBA.g, Config.BulletholeMarkerRGBA.b, Config.BulletholeMarkerRGBA.a, false, true, 2, nil, nil, false)
+                                    else
+                                        DrawMarker(0, v.coords.x, v.coords.y, v.coords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.15, 0.15, 0.1, Config.BulletholeMarkerRGBA.r, Config.BulletholeMarkerRGBA.g, Config.BulletholeMarkerRGBA.b, Config.BulletholeMarkerRGBA.a, false, true, 2, nil, nil, false)
+                                    end
+                                    if raycastdist < 0.25 and dist < 2.5 then
+                                        DrawText3D(v.coords.x, v.coords.y, v.coords.z  -0.05, Lang:t('info.bullet_casing'))
+                                        if IsControlJustReleased(0, 23) then
+                                            local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
+                                            local street1 = GetStreetNameFromHashKey(s1)
+                                            local street2 = GetStreetNameFromHashKey(s2)
+                                            local streetLabel = street1
+                                            if street2 then
+                                                streetLabel = streetLabel .. ' | ' .. street2
+                                            end
+                                            local info = {
+                                                label = Lang:t('info.bullet'),
+                                                type = 'bullet',
+                                                street = streetLabel:gsub("%'", ''),
+                                                ammolabel = Config.AmmoLabels[QBCore.Shared.Weapons[Casings[CurrentCasing].type]['ammotype']],
+                                                ammotype = Bullethole[CurrentBullethole].type,
+                                                serie = Bullethole[CurrentBullethole].serie
+
+                                            }
+                                            TriggerServerEvent('evidence:server:AddBulletToInventory', CurrentBullethole, info)
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                        if next(Fragements) then
+                            local pos = GetEntityCoords(PlayerPedId(), true)
+                            for k, v in pairs(Fragements) do
+                                local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
+                                local raycastdist = #(coords - vector3(v.coords.x, v.coords.y, v.coords.z))
+                                if dist < 20 then
+                                    CurrentVehicleFragement = k
+                                    if GetEntityType(entityHit) then
+                                        if dist < 7.5 and dist > 1.5 then
+                                            DrawText3D(v.coords.x, v.coords.y, v.coords.z +0.05, Lang:t('info.vehicle_fragement'))
+                                        end
+                                        DrawMarker(36, v.coords.x, v.coords.y, v.coords.z -0.05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.3, 0.2, v.r, v.g, v.b, 220, false, true, 2, nil, nil, false)
+                                    end
+                                    if dist < 1.5 then
+                                        DrawText3D(v.coords.x, v.coords.y, v.coords.z  -0.05, Lang:t('info.bullet_casing'))
+                                        if IsControlJustReleased(0, 23) then
+                                            local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
+                                            local street1 = GetStreetNameFromHashKey(s1)
+                                            local street2 = GetStreetNameFromHashKey(s2)
+                                            local streetLabel = street1
+                                            if street2 then
+                                                streetLabel = streetLabel .. ' | ' .. street2
+                                            end
+                                            local info = {
+                                                label = Lang:t('info.bullet'),
+                                                type = 'vehiclefragement',
+                                                street = streetLabel:gsub("%'", ''),
+                                                rgb = "R: " ..v.r.. " / G: " ..v.g.. " / B: " ..v.b,
+                                                ammotype = Fragements[CurrentVehicleFragement].type,
+                                                serie = Fragements[CurrentVehicleFragement].serie,
+                                            }
+                                            TriggerServerEvent('evidence:server:AddFragementToInventory', CurrentVehicleFragement, info)
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    else
+                        Wait(1000)
+                    end
+                else
+                    Wait(5000)
+                end
+            end
+        end
+    end)
+end
+------------------------------------------------------------------------------[ toggleDrawLine Stuff ( Credits to ByBlackDeath ) ]------------------------------------------------------------------------------
+local toggleDrawLine = false
+
+RegisterNetEvent('evidence:client:toggleDrawLine', function()
+    toggleDrawLine = not toggleDrawLine
+
+    if toggleDrawLine then 
+        if Config.Notify == "qb" then
+            QBCore.Functions.Notify(Lang:t('error.drawLine_enabled'), 'success') 
+        elseif Config.Notify == "ox" then
+            lib.notify({ title = 'Evidence', description = Lang:t('error.error.drawLine_drawLine_enabled'), duration = 5000, type = 'success' })
+        else
+            print(Lang:t('error.config_error'))
+        end
+    else
+        DrawLineDisableNotify()
+    end
+
+    CreateThread(function()
+        while toggleDrawLine do
+            Wait(5)
+            if LocalPlayer.state.isLoggedIn then
+                if PlayerJob.type == 'leo' and PlayerJob.onduty then
+                    local selectedWeapon = GetSelectedPedWeapon(PlayerPedId())
+                    if selectedWeapon ~= GetHashKey('weapon_unarmed') then
+                        if selectedWeapon ~= GetHashKey('weapon_flashlight') then
+                            if Config.Notify == "qb" then
+                                QBCore.Functions.Notify(Lang:t('error.drawLine_weapon_in_hand'), 'error') 
+                            elseif Config.Notify == "ox" then
+                                lib.notify({ title = 'Evidence', description = Lang:t('error.error.drawLine_weapon_in_hand'), duration = 5000, type = 'error' })
+                            else
+                                print(Lang:t('error.config_error'))
+                            end
+                            
+                            toggleDrawLine = false
+                            break
                         end
                     end
                     if next(Bullethole) then
                         local pos = GetEntityCoords(PlayerPedId(), true)
                         for k, v in pairs(Bullethole) do
                             local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
-                            local raycastdist = #(coords - vector3(v.coords.x, v.coords.y, v.coords.z))
                             if dist < 20 then
                                 CurrentBullethole = k
-                                if Config.ShowShootersLine then
-                                    DrawLine(v.coords.x, v.coords.y, v.coords.z -0.05, v.pedcoord.x, v.pedcoord.y, v.pedcoord.z, v.drawLine_r, v.drawLine_g, v.drawLine_b, 255)
-                                end
-                                if pos.z < v.coords.z then
-                                    DrawMarker(6, v.coords.x, v.coords.y, v.coords.z -0.05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.5, 0.1, Config.BulletholeMarkerRGBA.r, Config.BulletholeMarkerRGBA.g, Config.BulletholeMarkerRGBA.b, Config.BulletholeMarkerRGBA.a, false, true, 2, nil, nil, false)
+                                DrawLine(v.coords.x, v.coords.y, v.coords.z -0.05, v.pedcoord.x, v.pedcoord.y, v.pedcoord.z, v.drawLine_r, v.drawLine_g, v.drawLine_b, 255)
+                            elseif dist > 20 then
+                                if Config.Notify == "qb" then
+                                    QBCore.Functions.Notify(Lang:t('error.drawLine_too_far_away'), 'error') 
+                                elseif Config.Notify == "ox" then
+                                    lib.notify({ title = 'Evidence', description = Lang:t('error.error.drawLine_too_far_away'), duration = 5000, type = 'error' })
                                 else
-                                    DrawMarker(0, v.coords.x, v.coords.y, v.coords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.15, 0.15, 0.1, Config.BulletholeMarkerRGBA.r, Config.BulletholeMarkerRGBA.g, Config.BulletholeMarkerRGBA.b, Config.BulletholeMarkerRGBA.a, false, true, 2, nil, nil, false)
+                                    print(Lang:t('error.config_error'))
                                 end
-                                if raycastdist < 0.25 and dist < 2.5 then
-                                    DrawText3D(v.coords.x, v.coords.y, v.coords.z  -0.05, Lang:t('info.bullet_casing'))
-                                    if IsControlJustReleased(0, 23) then
-                                        local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
-                                        local street1 = GetStreetNameFromHashKey(s1)
-                                        local street2 = GetStreetNameFromHashKey(s2)
-                                        local streetLabel = street1
-                                        if street2 then
-                                            streetLabel = streetLabel .. ' | ' .. street2
-                                        end
-                                        local info = {
-                                            label = Lang:t('info.bullet'),
-                                            type = 'bullet',
-                                            street = streetLabel:gsub("%'", ''),
-                                            ammolabel = Config.AmmoLabels[QBCore.Shared.Weapons[Casings[CurrentCasing].type]['ammotype']],
-                                            ammotype = Bullethole[CurrentBullethole].type,
-                                            serie = Bullethole[CurrentBullethole].serie
-                                        }
-                                        TriggerServerEvent('evidence:server:AddBulletToInventory', CurrentBullethole, info)
-                                        if Config.Inventory == "ox" then
-                                            exports.ox_inventory:displayMetadata({
-                                                label = 'Label',
-                                                type = 'Type',
-                                                street = 'Street',
-                                                ammolabel = 'Ammo Label',
-                                                ammotype = 'Ammo Type',
-                                                serie = 'Serial'
-                                            })
-                                        end
-                                    end
-                                end
+                                toggleDrawLine = false
+                                break
                             end
                         end
                     end
@@ -891,58 +1170,18 @@ CreateThread(function()
                         local pos = GetEntityCoords(PlayerPedId(), true)
                         for k, v in pairs(Fragements) do
                             local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
-                            local raycastdist = #(coords - vector3(v.coords.x, v.coords.y, v.coords.z))
                             if dist < 20 then
                                 CurrentVehicleFragement = k
-                                if Config.ShowShootersLine then
-                                    DrawLine(v.coords.x, v.coords.y, v.coords.z -0.05, v.pedcoord.x, v.pedcoord.y, v.pedcoord.z, v.drawLine_r, v.drawLine_g, v.drawLine_b, 255)
-                                end
-                                if GetEntityType(entityHit) then
-                                    if dist < 7.5 and dist > 1.5 then
-                                        DrawText3D(v.coords.x, v.coords.y, v.coords.z +0.05, Lang:t('info.vehicle_fragement'))
-                                    end
-                                    DrawMarker(36, v.coords.x, v.coords.y, v.coords.z -0.05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.3, 0.2, v.r, v.g, v.b, 220, false, true, 2, nil, nil, false)
-                                end
-                                if dist < 1.5 then
-                                    DrawText3D(v.coords.x, v.coords.y, v.coords.z  -0.05, Lang:t('info.bullet_casing'))
-                                    if IsControlJustReleased(0, 23) then
-                                        local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
-                                        local street1 = GetStreetNameFromHashKey(s1)
-                                        local street2 = GetStreetNameFromHashKey(s2)
-                                        local streetLabel = street1
-                                        if street2 then
-                                            streetLabel = streetLabel .. ' | ' .. street2
-                                        end
-                                        local info = {
-                                            label = Lang:t('info.bullet'),
-                                            type = 'vehiclefragement',
-                                            street = streetLabel:gsub("%'", ''),
-                                            rgb = "R: " ..v.r.. " / G: " ..v.g.. " / B: " ..v.b,
-                                            ammotype = Fragements[CurrentVehicleFragement].type,
-                                            serie = Fragements[CurrentVehicleFragement].serie
-                                        }
-                                        TriggerServerEvent('evidence:server:AddFragementToInventory', CurrentVehicleFragement, info)
-                                        if Config.Inventory == "ox" then
-                                            exports.ox_inventory:displayMetadata({
-                                                label = 'Label',
-                                                type = 'Type',
-                                                street = 'Street',
-                                                rgb = '',
-                                                ammotype = 'Ammo Type',
-                                                serie = 'Serial'
-                                            })
-                                        end
-                                    end
-                                end
+                                DrawLine(v.coords.x, v.coords.y, v.coords.z -0.05, v.pedcoord.x, v.pedcoord.y, v.pedcoord.z, v.drawLine_r, v.drawLine_g, v.drawLine_b, 255)
                             end
                         end
                     end
                 else
-                    Wait(1000)
+                    DrawLineDisableNotify()
+                    toggleDrawLine = false
+                    break
                 end
-            else
-                Wait(5000)
             end
         end
-    end
+    end)
 end)
