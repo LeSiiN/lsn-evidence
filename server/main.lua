@@ -266,11 +266,27 @@ RegisterNetEvent('evidence:server:AddBlooddropToInventory', function(bloodId, bl
     local Player = QBCore.Functions.GetPlayer(src)
     if Player.Functions.RemoveItem('empty_evidence_bag', 1) then
         TriggerClientEvent('evidence:client:PlayerPickUpAnimation', src)
+        if Config.Inventory == "ox" then
+            local info = {}
+            info.label = bloodInfo.label
+            info.type = bloodInfo.type
+            info.street = bloodInfo.street
+            info.dnalabel = bloodInfo.dnalabel
+            info.dnalabel2 = bloodInfo.dnalabel2
+            info.bloodtype = bloodInfo.bloodtype
+            info.bloodtype2 = bloodInfo.bloodtype2
+            if exports.ox_inventory:CanCarryItem(src, 'filled_evidence_bag', 1) then
+                exports.ox_inventory:AddItem(src, 'filled_evidence_bag', 1, info)
+            end
+            TriggerClientEvent('evidence:client:RemoveBlooddrop', -1, bloodId)
+            BloodDrops[bloodId] = nil
+        else
         if Player.Functions.AddItem('filled_evidence_bag', 1, false, bloodInfo) then
             TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['filled_evidence_bag'], 'add')
             TriggerClientEvent('evidence:client:RemoveBlooddrop', -1, bloodId)
             BloodDrops[bloodId] = nil
         end
+    end
     else
         if Config.Notify == "qb" then
             TriggerClientEvent('QBCore:Notify', src, Lang:t('error.have_evidence_bag'), 'error')
@@ -305,11 +321,25 @@ RegisterNetEvent('evidence:server:AddFingerprintToInventory', function(fingerId,
     local Player = QBCore.Functions.GetPlayer(src)
     if Player.Functions.RemoveItem('empty_evidence_bag', 1) then
         TriggerClientEvent('evidence:client:PlayerPickUpAnimation', src)
+        if Config.Inventory == "ox" then
+            local info = {}
+            info.label = fingerInfo.label
+            info.type = fingerInfo.type
+            info.street = fingerInfo.street
+            info.serie = fingerInfo.fingerprint
+            info.serie2 = fingerInfo.fingerprint2
+            if exports.ox_inventory:CanCarryItem(src, 'filled_evidence_bag', 1) then
+                exports.ox_inventory:AddItem(src, 'filled_evidence_bag', 1, info)
+            end
+            TriggerClientEvent('evidence:client:RemoveFingerprint', -1, fingerId)
+            FingerDrops[fingerId] = nil
+        else
         if Player.Functions.AddItem('filled_evidence_bag', 1, false, fingerInfo) then
             TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['filled_evidence_bag'], 'add')
             TriggerClientEvent('evidence:client:RemoveFingerprint', -1, fingerId)
             FingerDrops[fingerId] = nil
         end
+    end
     else
         if Config.Notify == "qb" then
             TriggerClientEvent('QBCore:Notify', src, Lang:t('error.have_evidence_bag'), 'error')
@@ -328,11 +358,20 @@ RegisterNetEvent('evidence:server:CreateCasing', function(weapon, coords, curren
     local casingId = CreateCasingId()
     local weaponInfo = QBCore.Shared.Weapons[weapon]
     local serieNumber = nil
-    if weaponInfo then
-        local weaponItem = Player.Functions.GetItemByName(weaponInfo['name'])
-        if weaponItem then
-            if weaponItem.info and weaponItem.info ~= '' then
-                serieNumber = weaponItem.info.serie
+    if Config.Inventory == "ox" then
+        weaponInfo = exports.ox_inventory:GetCurrentWeapon(src)
+        if weaponInfo then
+            if weaponInfo.metadata and weaponInfo.metadata ~= '' then
+                serieNumber = weaponInfo.metadata.serial
+            end
+        end
+    else
+        if weaponInfo then
+            local weaponItem = Player.Functions.GetItemByName(weaponInfo['name'])
+            if weaponItem then
+                if weaponItem.info and weaponItem.info ~= '' then
+                    serieNumber = weaponItem.info.serie
+                end
             end
         end
     end
@@ -353,11 +392,28 @@ RegisterNetEvent('evidence:server:AddCasingToInventory', function(casingId, casi
     local Player = QBCore.Functions.GetPlayer(src)
     if Player.Functions.RemoveItem('empty_evidence_bag', 1) then
         TriggerClientEvent('evidence:client:PlayerPickUpAnimation', src)
+        if Config.Inventory == "ox" then
+            local info = {}
+            info.label = casingInfo.label
+            info.type = casingInfo.type
+            info.street = casingInfo.street
+            info.ammolabel = casingInfo.ammolabel
+            info.ammotype = casingInfo.ammotype
+            info.ammotype2 = casingInfo.ammotype2
+            info.serie = casingInfo.serie
+            info.serie2 = casingInfo.serie2
+            if exports.ox_inventory:CanCarryItem(src, 'filled_evidence_bag', 1) then
+                exports.ox_inventory:AddItem(src, 'filled_evidence_bag', 1, info)
+            end
+            TriggerClientEvent('evidence:client:RemoveCasing', -1, casingId)
+            Casings[casingId] = nil
+        else
         if Player.Functions.AddItem('filled_evidence_bag', 1, false, casingInfo) then
             TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['filled_evidence_bag'], 'add')
             TriggerClientEvent('evidence:client:RemoveCasing', -1, casingId)
             Casings[casingId] = nil
         end
+    end
     else
         if Config.Notify == "qb" then
             TriggerClientEvent('QBCore:Notify', src, Lang:t('error.have_evidence_bag'), 'error')
@@ -376,11 +432,20 @@ RegisterNetEvent('evidence:server:CreateBullethole', function(weapon, raycastcoo
     local bulletholeId = CreateBulletholeId()
     local weaponInfo = QBCore.Shared.Weapons[weapon]
     local serieNumber = nil
-    if weaponInfo then
-        local weaponItem = Player.Functions.GetItemByName(weaponInfo['name'])
-        if weaponItem then
-            if weaponItem.info and weaponItem.info ~= '' then
-                serieNumber = weaponItem.info.serie
+    if Config.Inventory == "ox" then
+        weaponInfo = exports.ox_inventory:GetCurrentWeapon(src)
+        if weaponInfo then
+            if weaponInfo.metadata and weaponInfo.metadata ~= '' then
+                serieNumber = weaponInfo.metadata.serial
+            end
+        end
+    else
+        if weaponInfo then
+            local weaponItem = Player.Functions.GetItemByName(weaponInfo['name'])
+            if weaponItem then
+                if weaponItem.info and weaponItem.info ~= '' then
+                    serieNumber = weaponItem.info.serie
+                end
             end
         end
     end
@@ -401,11 +466,28 @@ RegisterNetEvent('evidence:server:AddBulletToInventory', function(bulletholeId, 
     local Player = QBCore.Functions.GetPlayer(src)
     if Player.Functions.RemoveItem('empty_evidence_bag', 1) then
         TriggerClientEvent('evidence:client:PlayerPickUpAnimation', src)
+        if Config.Inventory == "ox" then
+            local info = {}
+            info.label = bulletInfo.label
+            info.type = bulletInfo.type
+            info.street = bulletInfo.street
+            info.ammolabel = bulletInfo.ammolabel
+            info.ammotype = bulletInfo.ammotype
+            info.ammotype2 = bulletInfo.ammotype2
+            info.serie = bulletInfo.serie
+            info.serie2 = bulletInfo.serie2
+            if exports.ox_inventory:CanCarryItem(src, 'filled_evidence_bag', 1) then
+                exports.ox_inventory:AddItem(src, 'filled_evidence_bag', 1, info)
+            end
+            TriggerClientEvent('evidence:client:RemoveBullethole', -1, bulletholeId)
+            Bullethole[bulletholeId] = nil
+        else
         if Player.Functions.AddItem('filled_evidence_bag', 1, false, bulletInfo) then
             TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['filled_evidence_bag'], 'add')
             TriggerClientEvent('evidence:client:RemoveBullethole', -1, bulletholeId)
             Bullethole[bulletholeId] = nil
         end
+    end
     else
         if Config.Notify == "qb" then
             TriggerClientEvent('QBCore:Notify', src, Lang:t('error.have_evidence_bag'), 'error')
@@ -424,11 +506,20 @@ RegisterNetEvent('evidence:server:CreateVehicleFragement', function(weapon, rayc
     local vehiclefragementId = CreateVehicleFragementId()
     local weaponInfo = QBCore.Shared.Weapons[weapon]
     local serieNumber = nil
-    if weaponInfo then
-        local weaponItem = Player.Functions.GetItemByName(weaponInfo['name'])
-        if weaponItem then
-            if weaponItem.info and weaponItem.info ~= '' then
-                serieNumber = weaponItem.info.serie
+    if Config.Inventory == "ox" then
+        weaponInfo = exports.ox_inventory:GetCurrentWeapon(src)
+        if weaponInfo then
+            if weaponInfo.metadata and weaponInfo.metadata ~= '' then
+                serieNumber = weaponInfo.metadata.serial
+            end
+        end
+    else
+        if weaponInfo then
+            local weaponItem = Player.Functions.GetItemByName(weaponInfo['name'])
+            if weaponItem then
+                if weaponItem.info and weaponItem.info ~= '' then
+                    serieNumber = weaponItem.info.serie
+                end
             end
         end
     end
@@ -449,11 +540,29 @@ RegisterNetEvent('evidence:server:AddFragementToInventory', function(vehiclefrag
     local Player = QBCore.Functions.GetPlayer(src)
     if Player.Functions.RemoveItem('empty_evidence_bag', 1) then
         TriggerClientEvent('evidence:client:PlayerPickUpAnimation', src)
+        if Config.Inventory == "ox" then
+            local info = {}
+            info.label = fragementInfo.label
+            info.type = fragementInfo.type
+            info.street = fragementInfo.street
+            info.rgb = fragementInfo.rgb
+            info.rgb2 = fragementInfo.rgb2
+            info.ammotype = fragementInfo.ammotype
+            info.ammotype2 = fragementInfo.ammotype2
+            info.serie = fragementInfo.serie
+            info.serie2 = fragementInfo.serie2
+            if exports.ox_inventory:CanCarryItem(src, 'filled_evidence_bag', 1) then
+                exports.ox_inventory:AddItem(src, 'filled_evidence_bag', 1, info)
+            end
+            TriggerClientEvent('evidence:client:RemoveVehicleFragement', -1, vehiclefragementId)
+            Fragements[vehiclefragementId] = nil
+        else
         if Player.Functions.AddItem('filled_evidence_bag', 1, false, fragementInfo) then
             TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['filled_evidence_bag'], 'add')
             TriggerClientEvent('evidence:client:RemoveVehicleFragement', -1, vehiclefragementId)
             Fragements[vehiclefragementId] = nil
         end
+    end
     else
         if Config.Notify == "qb" then
             TriggerClientEvent('QBCore:Notify', src, Lang:t('error.have_evidence_bag'), 'error')

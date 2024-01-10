@@ -20,7 +20,7 @@ local Translations = {
         bullet_hole_removed = 'Bullet Holes Removed...',
         vehicle_fragement_removed = 'Vehicle Fragements Removed...',
         crime_scene_removed = 'Crime Scene Removed...',
- },
+    },
     info = {
         dna_sample = 'DNA Sample',
         bullet_casing = '[~g~F~s~] Pick up',
