@@ -19,7 +19,7 @@ rag                         = { name = 'rag', label = 'Rag', weight = 100, type 
 evidencecleaningkit         = { name = 'evidencecleaningkit', label = 'Evidence Cleaning Kit', weight = 250, type = 'item', image = 'cleaningkit.png', unique = false, useable = true, shouldClose = true, combinable = nil, description = 'Cleans every Evidence near a police Officer.' },
 policepointer         = { name = 'policepointer', label = 'Laserpointer', weight = 250, type = 'item', image = 'laserpointer.png', unique = true, useable = true, shouldClose = true, combinable = nil, description = 'Can be placed inside Bulletholes.' },
 ```
-- Place the image inside your images folder in your inventory. ( ox-inventory will follow! )
+- Place the image inside your images folder in your inventory.
 - Add the following code to your app.js of your inventory (31.12.2023 Version  ->  line 365 )
 ```
         case "filled_evidence_bag":
@@ -70,7 +70,7 @@ Config.AmmoLabels = {
 ```
 
 # IF USING HI-DEV POLICEJOB ALSO DO THIS:
-- Replace `police:client:FindEvidenceBag` inside your client/main.lua
+- Replace `police:client:FindEvidenceBag` inside your client/evidence.lua
 ```
 RegisterNetEvent('police:client:FindEvidenceBag', function()
     local PlayerData = QBCore.Functions.GetPlayerData()
@@ -99,7 +99,7 @@ RegisterNetEvent('police:client:FindEvidenceBag', function()
         optparams = {
             event = 'police:client:SelectEvidence',
             args = {type = 'vehiclefragement', label = 'Vehicle Fragment', icon = 'car',}
-        }}         
+        }}
     FindEvidence[#FindEvidence+1] = {opthead = Lang:t('menu.close_x'), opticon = 'xmark', optparams = {event = ''}}
 
     local header = {
@@ -148,7 +148,7 @@ examine_menu_frags_b = "Examine vehicle fragment",
 
 ## 💰 You can help me by Donating
 [![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/LeSiiN)
-  
+
 # Credits
 - [RazerGhost](https://github.com/RazerGhost)
 - [My little Family](https://github.com/Project-Sloth)
