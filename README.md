@@ -146,6 +146,9 @@ examine_menu_frags_b = "Examine vehicle fragment",
 - evidencecleaningkit - Allows Police Officers to remove evidence. ( No need for the commands then )
 - policepointer - Allows Police Officers to see the DrawLines.
 
+## 💰 You can help me by Donating
+[![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/LeSiiN)
+  
 # Credits
 - [RazerGhost](https://github.com/RazerGhost)
 - [My little Family](https://github.com/Project-Sloth)
