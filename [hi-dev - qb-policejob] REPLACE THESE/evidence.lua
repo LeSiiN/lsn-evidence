@@ -63,7 +63,7 @@ RegisterNetEvent('police:client:SelectEvidence', function(Data)
             local EvidenceBagsMenu = {}
 
             for _, n in pairs(List) do
-                EvidenceBagsMenu[#EvidenceBagsMenu+1] = {opthead = n.label, optdesc = Lang:t('info.select_for_examine_b', {street = n.metadata.street, label= n.metadata.label, slot=n.slot}), opticon = 'caret-right',
+                EvidenceBagsMenu[#EvidenceBagsMenu+1] = {opthead = n.label, optdesc = Lang:t('info.select_for_examine_b', {street = n.info.street, label= n.info.label, slot=n.slot}), opticon = 'caret-right',
                     optparams  = {
                         event = 'police:client:ExamineEvidenceBag',
                         args = {Item = n,slot = n.slot}
@@ -84,7 +84,7 @@ RegisterNetEvent('police:client:SelectEvidence', function(Data)
 end)
 
 RegisterNetEvent('police:client:ExamineEvidenceBag', function(Data)
-    QBCore.Functions.Progressbar('examine_evidence_bag', Lang:t('progressbar.examining', {label = Data.Item.metadata.label}), 5000, false, false, {
+    QBCore.Functions.Progressbar('examine_evidence_bag', Lang:t('progressbar.examining', {label = Data.Item.info.label}), 5000, false, false, {
         disableMovement = true,
         disableCarMovement = false,
         disableMouse = false,
