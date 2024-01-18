@@ -70,48 +70,6 @@ Config.AmmoLabels = {
 ```
 
 # IF USING HI-DEV POLICEJOB ALSO DO THIS:
-- Replace `police:client:FindEvidenceBag` inside your client/evidence.lua
-```
-RegisterNetEvent('police:client:FindEvidenceBag', function()
-    local PlayerData = QBCore.Functions.GetPlayerData()
-    local FindEvidence = {}
-    FindEvidence[#FindEvidence+1] = {opthead = Lang:t('evidence.examine_menu_blood_h'), optdesc = Lang:t('evidence.examine_menu_blood_b'), opticon = 'droplet',
-        optparams = {
-            event = 'police:client:SelectEvidence',
-            args = {type = 'blood', label = 'Blood', icon = 'droplet'}
-        }}
-    FindEvidence[#FindEvidence+1] = {opthead = Lang:t('evidence.examine_menu_casing_h'), optdesc = Lang:t('evidence.examine_menu_casing_b'), opticon = 'joint',
-        optparams = {
-            event = 'police:client:SelectEvidence',
-            args = {type = 'casing', label = 'Bullet casing', icon = 'joint'}
-        }}
-    FindEvidence[#FindEvidence+1] = {opthead = Lang:t('evidence.examine_menu_fingerprint_b'),optdesc = Lang:t('evidence.examine_menu_fingerprint_h'), opticon = 'fingerprint',
-        optparams = {
-            event = 'police:client:SelectEvidence',
-            args = {type = 'fingerprint', label = 'Fingerprint', icon = 'fingerprint',}
-        }}
-    FindEvidence[#FindEvidence+1] = {opthead = Lang:t('evidence.examine_menu_bullet_b'),optdesc = Lang:t('evidence.examine_menu_bullet_h'), opticon = 'joint',
-        optparams = {
-            event = 'police:client:SelectEvidence',
-            args = {type = 'bullet', label = 'Bullet', icon = 'joint',}
-        }}
-    FindEvidence[#FindEvidence+1] = {opthead = Lang:t('evidence.examine_menu_frags_b'),optdesc = Lang:t('evidence.examine_menu_frags_h'), opticon = 'car',
-        optparams = {
-            event = 'police:client:SelectEvidence',
-            args = {type = 'vehiclefragement', label = 'Vehicle Fragment', icon = 'car',}
-        }}
-    FindEvidence[#FindEvidence+1] = {opthead = Lang:t('menu.close_x'), opticon = 'xmark', optparams = {event = ''}}
-
-    local header = {
-        disabled = true,
-        header = PlayerData.job.label,
-        headerid = 'police_evidencebags_menu', -- unique
-        desc = '',
-        icon = 'microscope'
-    }
-    ContextSystem.Open(header, FindEvidence)
-end)
-```
 - Place the following locales inside your locales folder make sure its in the evidence table(en.lua for example)
 ```
 examine_menu_bullet_h = "Examine ammunition fragment",
