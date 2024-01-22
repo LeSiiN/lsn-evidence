@@ -1,6 +1,32 @@
 # lsn-evidence
     This Script was made from the evidence Code from qb-policejob! Please follow the Installation!
 
+# Features
+- Bullet casings as Evidence
+- Blood drop as Evidence
+- Fingerprint drops as Evidence
+- Bulletholes as Evidence
+- Vehicle Fragements as Evidence
+- DrawLine of the Shooting Position
+- Evidence can be checked via weapon_flashlight ( can be picked up )
+- Criminals can remove evidence
+- Also work when Player is using a Camera ( must be playing a specific animation )
+- By using the Laserpointer near a Bullethole u can see the DrawLines of each shoot
+- Evidence automatically removes after 45Min. (Performance thing)
+
+# Commands ( OPTIONAL )
+- /clearblood - Clears nearby blood drops.
+- /clearcasings - Clears nearby bullet casings.
+- /clearholes - Clears nearby Bullet Holes drops.
+- /clearfragements - Clears nearby Vehicle Fragements drops.
+- /clearscene - Clears all nearby evidence drops.
+- /takedna [id] - Takes a DNA sample from the player.
+
+# New Items
+- rag - Allows Criminals to delete nearby Evidence.
+- evidencecleaningkit - Allows Police Officers to remove evidence. ( No need for the commands then )
+- policepointer - Allows Police Officers to see the DrawLines.
+
 # Dependencies
 - [qb-core](https://github.com/qbcore-framework/qb-core)
 - [ox_lib](https://github.com/overextended/ox_lib/releases)
@@ -77,32 +103,6 @@ examine_menu_bullet_b = "Examine ammunition fragment",
 examine_menu_frags_h = "Examine vehicle fragment",
 examine_menu_frags_b = "Examine vehicle fragment",
 ```
-
-# Features
-- Bullet casings as Evidence
-- Blood drop as Evidence
-- Fingerprint drops as Evidence
-- Bulletholes as Evidence
-- Vehicle Fragements as Evidence
-- DrawLine of the Shooting Position
-- Evidence can be checked via weapon_flashlight ( can be picked up )
-- Criminals can remove evidence
-- Also work when Player is using a Camera ( must be playing a specific animation )
-- By using the Laserpointer near a Bullethole u can see the DrawLines of each shoot
-- Evidence automatically removes after 45Min. (Performance thing)
-
-# Commands ( OPTIONAL )
-- /clearblood - Clears nearby blood drops.
-- /clearcasings - Clears nearby bullet casings.
-- /clearholes - Clears nearby Bullet Holes drops.
-- /clearfragements - Clears nearby Vehicle Fragements drops.
-- /clearscene - Clears all nearby evidence drops.
-- /takedna [id] - Takes a DNA sample from the player.
-
-# New Items
-- rag - Allows Criminals to delete nearby Evidence.
-- evidencecleaningkit - Allows Police Officers to remove evidence. ( No need for the commands then )
-- policepointer - Allows Police Officers to see the DrawLines.
 
 ## 💰 You can help me by Donating
 [![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/LeSiiN)
