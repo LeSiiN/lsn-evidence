@@ -40,13 +40,31 @@ ensure qb-core
 ensure lsn-evidence
 ```
 - Place the next code inside your items.lua
+
+<details><summary> If you use New QBCore</summary>
+    
 ```
 rag                         = { name = 'rag', label = 'Rag', weight = 100, type = 'item', image = 'rag.png', unique = false, useable = true, shouldClose = true, combinable = nil, description = 'Could get Handy.' },
 evidencecleaningkit         = { name = 'evidencecleaningkit', label = 'Evidence Cleaning Kit', weight = 250, type = 'item', image = 'cleaningkit.png', unique = false, useable = true, shouldClose = true, combinable = nil, description = 'Cleans every Evidence near a police Officer.' },
 policepointer         = { name = 'policepointer', label = 'Laserpointer', weight = 250, type = 'item', image = 'laserpointer.png', unique = true, useable = true, shouldClose = true, combinable = nil, description = 'Can be placed inside Bulletholes.' },
 ```
+</details>
+
+<details><summary> If you use Old QBCore</summary>
+
+```
+["rag"]                          = { ["name"] = 'rag', ["label"] = 'Rag', ["weight"] = 100, ["type"] = 'item', ["image"] = 'rag.png', ["unique"] = false, ["useable"] = true, ["shouldClose"] = true, ["combinable"] = nil, ["description"] = 'Could get Handy.' },
+["evidencecleaningkit"]          = { ["name"] = 'evidencecleaningkit', ["label"] = 'Evidence Cleaning Kit', ["weight"] = 250, ["type"] = 'item', ["image"] = 'cleaningkit.png', ["unique"] = false, ["useable"] = true, ["shouldClose"] = true, ["combinable"] = nil, ["description"] = 'Cleans every Evidence near a police Officer.' },
+["policepointer"]                = { ["name"] = 'policepointer', ["label"] = 'Laserpointer', ["weight"] = 250, ["type"] = 'item', ["image"] = 'laserpointer.png', ["unique"] = true, ["useable"] = true, ["shouldClose"] = true, ["combinable"] = nil, ["description"] = 'Can be placed inside Bulletholes.' },
+```
+</details>
+
+# Inventory
 - Place the image inside your images folder in your inventory.
-- Add the following code to your app.js of your inventory (31.12.2023 Version  ->  line 365 )
+
+<details><summary> If you use New qb inventory</summary>
+
+Add the following code to your app.js of your inventory (31.12.2023 Version  ->  line 365 )
 ```
         case "filled_evidence_bag":
             if (itemData.info.type == "casing") {
@@ -81,6 +99,111 @@ policepointer         = { name = 'policepointer', label = 'Laserpointer', weight
                 <p><strong>DNA Code: </strong><span>${itemData.info.dnalabel}</span></p><br /><p>${itemData.description}</p>`;
             }
 ```
+
+</details>
+
+<details><summary> If you use ps/lj inventory or old qb inventory( From Nov 3 2023)</summary>
+
+lj line 559~
+ps line 560~
+qb line 375~
+
+Replace the following code to your app.js of your inventory
+```
+        else if (itemData.name == "filled_evidence_bag") {
+            $(".item-info-title").html("<p>" + itemData.label + "</p>");
+            if (itemData.info.type == "casing") {
+                $(".item-info-description").html(
+                    "<p><strong>Evidence material: </strong><span>" +
+                    itemData.info.label +
+                    "</span></p><p><strong>Type number: </strong><span>" +
+                    itemData.info.ammotype +
+                    "</span></p><p><strong>Caliber: </strong><span>" +
+                    itemData.info.ammolabel +
+                    "</span></p><p><strong>Serial: </strong><span>" +
+                    itemData.info.serie +
+                    "</span></p><p><strong>Crime scene: </strong><span>" +
+                    itemData.info.street +
+                    "</span></p><br /><p>" +
+                    itemData.description +
+                    "</p>"
+                );
+            } else if (itemData.info.type == "bullet") {
+                $(".item-info-description").html(
+                    "<p><strong>Evidence material: </strong><span>" +
+                    itemData.info.label +
+                    "<p><strong>Type number: </strong><span>" +
+                    itemData.info.ammotype +
+                    "</span></p><p><strong>Bullet: </strong><span>" +
+                    itemData.info.ammolabel +
+                    "</span></p><p><strong>Serial Number: </strong><span>" +
+                    itemData.info.serie +
+                    "</span></p><p><strong>Crime scene: </strong><span>" +
+                    itemData.info.street +
+                    "</span></p><br /><p>" +
+                    itemData.description +
+                    "</p>"
+                );
+            } else if (itemData.info.type == "vehiclefragement") {
+                $(".item-info-description").html(
+                    "<p><strong>Evidence material: </strong><span>" +
+                    itemData.info.label +
+                    "</span></p><p><strong>Type number: </strong><span>" +
+                    itemData.info.ammotype +
+                    "</span></p><p><strong>Serial Number: </strong><span>" +
+                    itemData.info.serie +
+                    "</span></p><p><strong>Color: </strong><span>" +
+                    itemData.info.rgb +
+                    "</span></p><p><strong>Crime scene: </strong><span>" +
+                    itemData.info.street +
+                    "</span></p><br /><p>" +
+                    itemData.description +
+                    "</p>"
+                );
+            } else if (itemData.info.type == "blood") {
+                $(".item-info-description").html(
+                    "<p><strong>Evidence material: </strong><span>" +
+                    itemData.info.label +
+                    "</span></p><p><strong>Blood type: </strong><span>" +
+                    itemData.info.bloodtype +
+                    "</span></p><p><strong>DNA Code: </strong><span>" +
+                    itemData.info.dnalabel +
+                    "</span></p><p><strong>Crime scene: </strong><span>" +
+                    itemData.info.street +
+                    "</span></p><br /><p>" +
+                    itemData.description +
+                    "</p><p style=\"font-size:11px\"><b>Weight: </b>" + itemData.weight + " | <b>Amount: </b> " + itemData.amount + " | <b>Quality: </b> " + "<a style=\"font-size:11px;color:green\">" + Math.floor(itemData.info.quality) + "</a>"
+                );
+            } else if (itemData.info.type == "fingerprint") {
+                $(".item-info-description").html(
+                    "<p><strong>Evidence material: </strong><span>" +
+                    itemData.info.label +
+                    "</span></p><p><strong>Fingerprint: </strong><span>" +
+                    itemData.info.fingerprint +
+                    "</span></p><p><strong>Crime Scene: </strong><span>" +
+                    itemData.info.street +
+                    "</span></p><br /><p>" +
+                    itemData.description +
+                    "</p><p style=\"font-size:11px\"><b>Weight: </b>" + itemData.weight + " | <b>Amount: </b> " + itemData.amount + " | <b>Quality: </b> " + "<a style=\"font-size:11px;color:green\">" + Math.floor(itemData.info.quality) + "</a>"
+                );
+            } else if (itemData.info.type == "dna") {
+                $(".item-info-description").html(
+                    "<p><strong>Evidence material: </strong><span>" +
+                    itemData.info.label +
+                    "</span></p><p><strong>DNA Code: </strong><span>" +
+                    itemData.info.dnalabel +
+                    "</span></p><br /><p>" +
+                    itemData.description +
+                    "</p><p style=\"font-size:11px\"><b>Weight: </b>" + itemData.weight + " | <b>Amount: </b> " + itemData.amount + " | <b>Quality: </b> " + "<a style=\"font-size:11px;color:green\">" + Math.floor(itemData.info.quality) + "</a>"
+                );
+            }
+        }
+```
+
+</details>
+
+# QB-Policejob
+
 - Replace `evidence.lua` inside `REPLACE FOLDERS` with the `qb-policejob/client/evidence.lua`
 - Replace `main.lua` inside `REPLACE FOLDERS` with the `qb-policejob/server/main.lua`
 - Remove the following code from your `qb-policejob/config.lua`
