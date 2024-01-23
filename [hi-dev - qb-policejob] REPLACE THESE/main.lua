@@ -2,12 +2,13 @@
 local Plates = {}
 local PlayerStatus = {}
 local Objects = {}
-local QBCore = exports['qb-core']:GetCoreObject()
+QBCore = exports['qb-core']:GetCoreObject()
 local updatingCops = false
 local CuffedPlayers = {}
 local seckey = "hidev-"..math.random(111111, 999999)
 local GPSTable = {}
 local RepairPed = {}
+local LEOjobs = {}
 
 -- Functions
 local function UpdateBlips()
@@ -451,7 +452,7 @@ end)
 QBCore.Functions.CreateUseableItem("moneybag", function(source, item)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
-    if not Player or not Player.Functions.GetItemByName("moneybag") or not item.info or item.info == "" or Player.PlayerData.job.type == "leo" or not Player.Functions.RemoveItem("moneybag", 1, item.slot) then return end
+    if not Player or not Player.Functions.GetItemByName("moneybag") or not item.info or item.info == "" or Player.PlayerData.job.type == "leo" or not Inventory.RemoveItem(src, "moneybag", 1, item.slot) then return end
     Player.Functions.AddMoney("cash", tonumber(item.info.cash), "used-moneybag")
 end)
 
@@ -607,31 +608,28 @@ QBCore.Functions.CreateCallback('police:server:getCuffStatus', function(_, cb, p
 end)
 
 QBCore.Functions.CreateCallback('police:server:GetEvidenceByType', function(source, cb, type)
-    local EvidenceBags = exports[Config.Inventory]:GetItemsByName(source, 'filled_evidence_bag')
+    local EvidenceBags = Inventory.GetItem(source, 'filled_evidence_bag')
     if not EvidenceBags then TriggerClientEvent('QBCore:Notify', source, Lang:t('error.dont_have_evidence_bag'), 'error') end
     local ItemList = {}
-    
-    for k,v in pairs(EvidenceBags) do
-        if v.info.type == type then
-            if type == 'casing' then
-                if v.info.serie == 'Unknown' then
-                    ItemList[#ItemList+1] = v
+    if Config.Inventory == 'qb-inventory' or Config.Inventory == 'ps-inventory' then
+        for k,v in pairs(EvidenceBags) do
+            if v.info.type == type then
+                if type == 'casing' then if v.info.serie == Lang:t('info.unknown') then ItemList[#ItemList+1] = v end
+                elseif type == 'vehiclefragment' then if v.info.serie == Lang:t('info.unknown') then ItemList[#ItemList+1] = v end
+                elseif type == 'bullet' then if v.info.serie == Lang:t('info.unknown') then ItemList[#ItemList+1] = v end
+                elseif type == 'blood' then if v.info.dnalabel == Lang:t('info.unknown') then ItemList[#ItemList+1] = v end
+                elseif type == 'fingerprint' then if v.info.fingerprint == Lang:t('info.unknown') then ItemList[#ItemList+1] = v end
                 end
-            elseif type == 'blood' then
-                if v.info.dnalabel == 'Unknown' then
-                    ItemList[#ItemList+1] = v
-                end
-            elseif type == 'bullet' then
-                if v.info.serie == 'Unknown' then
-                    ItemList[#ItemList+1] = v
-                end
-            elseif type == 'vehiclefragement' then
-                if v.info.serie == 'Unknown' then
-                    ItemList[#ItemList+1] = v
-                end
-            elseif type == 'fingerprint' then
-                if v.info.fingerprint == 'Unknown' then
-                    ItemList[#ItemList+1] = v
+            end
+        end
+    elseif Config.Inventory == 'ox_inventory' then
+        for k,v in pairs(EvidenceBags) do
+            if v.metadata.type == type then
+                if type == 'casing' then if v.metadata.serie == Lang:t('info.unknown') then ItemList[#ItemList+1] = v end
+                elseif type == 'vehiclefragment' then if v.metadata.serie == Lang:t('info.unknown') then ItemList[#ItemList+1] = v end
+                elseif type == 'bullet' then if v.metadata.serie == Lang:t('info.unknown') then ItemList[#ItemList+1] = v end
+                elseif type == 'blood' then if v.metadata.dnalabel == Lang:t('info.unknown') then ItemList[#ItemList+1] = v end
+                elseif type == 'fingerprint' then if v.metadata.fingerprint == Lang:t('info.unknown') then ItemList[#ItemList+1] = v end
                 end
             end
         end
@@ -657,7 +655,7 @@ QBCore.Functions.CreateCallback('police:server:SetWeaponRepair', function(source
     local Player = QBCore.Functions.GetPlayer(src)
     if Player.PlayerData.items[weapdata.slot] then
         if Player.PlayerData.items[weapdata.slot].info.quality ~= 100 then
-            if Player.Functions.RemoveItem(weapdata.name, 1, weapdata.slot) then
+            if Inventory.RemoveItem(src, weapdata.name, 1, weapdata.slot) then
                 TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[weapdata.name], "remove")
                 TriggerClientEvent("inventory:client:CheckWeapon", src, weapdata.name)
                 RepairPed[loc].data = {
@@ -684,29 +682,60 @@ end)
 
 -- Events
 AddEventHandler('onResourceStart', function(resourceName)
-    if resourceName == GetCurrentResourceName() then
-        CreateThread(function()
-            MySQL.query("DELETE FROM stashitems WHERE stash = 'policetrash'")
-        end)
-        if Config.RepairStations.enabled then
-            for k,v in pairs(Config.RepairStations.locations) do
-                RepairPed[k] = {busy = false, data = {}}
-                RepairPed[k].pedid = NetworkGetNetworkIdFromEntity(CreatePed(5, v.pedhash, vector3(v.pedloc.x,v.pedloc.y,v.pedloc.z-1), v.pedloc.w, true, true))
-                RepairPed[k].key = k
-                RepairPed[k].pedloc = v.pedloc
-                RepairPed[k].walkto = v.walkto
-            end
+    if resourceName ~= GetCurrentResourceName() then return end
+    for k, v in pairs(QBCore.Shared.Jobs) do
+        if v.type == 'leo' then
+            LEOjobs[k] = 0
+        end
+    end
+    if Config.Inventory == 'ox_inventory' then
+        for i = 1, #Config.Locations['trash'] do
+            exports.ox_inventory:RegisterStash(('policetrash_%s'):format(i), 'Police Trash', 300, 4000000, nil, LEOjobs, Config.Locations['trash'][i])
+        end
+    end
+    if Config.RepairStations.enabled then
+        for k,v in pairs(Config.RepairStations.locations) do
+            RepairPed[k] = {busy = false, data = {}}
+            RepairPed[k].pedid = NetworkGetNetworkIdFromEntity(CreatePed(5, v.pedhash, vector3(v.pedloc.x,v.pedloc.y,v.pedloc.z-1), v.pedloc.w, true, true))
+            RepairPed[k].key = k
+            RepairPed[k].pedloc = v.pedloc
+            RepairPed[k].walkto = v.walkto
         end
     end
 end)
 
--- AddEventHandler('onResourceStop', function()
---    if next(RepairPed) then
---     for k,v in pairs(RepairPed) do
---         DeletePed(v.pedid)
---     end
---    end
--- end)
+AddEventHandler('onResourceStop', function()
+    if Config.Inventory == 'ox_inventory' then
+        for i = 1, #Config.Locations['trash'] do
+            exports.ox_inventory:ClearInventory(('policetrash_%s'):format(i))
+        end
+    elseif Config.Inventory == 'qb-inventory' or Config.Inventory == 'ps-inventory' then
+        CreateThread(function()
+            MySQL.query("DELETE FROM stashitems WHERE stash = 'policetrash'")
+        end)
+    end
+end)
+
+RegisterNetEvent('police:server:openStash', function(id, name)
+    Inventory.OpenStash(source, id, name)
+end)
+
+RegisterNetEvent('police:server:addTrunkItems', function(plate, items)
+    Wait(1000)
+    Inventory.TrunkItems(source, plate, items)
+end)
+
+RegisterNetEvent('police:server:openShop', function(name, items)
+    if Config.Inventory == 'ox_inventory' then
+        local si = {}
+        for k,v in pairs(items.items) do
+            si[#si+1] = {name = v.name, price = v.price}
+        end
+        Inventory.OpenShop(source, name, si, LEOjobs)
+    else
+        Inventory.OpenShop(source, name, items, LEOjobs)
+    end
+end)
 
 RegisterNetEvent('police:server:SetRepairPedStatus', function(loc, status, hasweapon)
     local src = source
@@ -794,7 +823,7 @@ RegisterNetEvent('police:server:CutCuffs', function(id, item)
     local citizenid = CuffedPlayer.PlayerData.citizenid
     local cuffed = CuffedPlayers[citizenid].cuffed
     if not Player or not CuffedPlayer or not Player.Functions.GetItemByName(item) or not cuffed then return end
-    if Player.Functions.AddItem(Config.BrokenCuffItem, 1) then
+    if Inventory.AddItem(src, Config.BrokenCuffItem, 1) then
         TriggerClientEvent('police:client:GetUnCuffed', CuffedPlayer.PlayerData.source, item)
     end
 end)
@@ -810,7 +839,7 @@ RegisterNetEvent('police:server:TiePlayer', function(playerId, isSoftcuff)
     local Player = QBCore.Functions.GetPlayer(src)
     local TiedPlayer = QBCore.Functions.GetPlayer(playerId)
     if not Player or not TiedPlayer or (not Player.Functions.GetItemByName("ziptie")) then return end
-    if Player.Functions.RemoveItem('ziptie', 1) then
+    if Inventory.RemoveItem(src, 'ziptie', 1) then
         TriggerClientEvent("police:client:GetTied", TiedPlayer.PlayerData.source, Player.PlayerData.source, isSoftcuff)
     end
 end)
@@ -1177,12 +1206,18 @@ end)
 
 RegisterNetEvent('police:server:setEvidenceBagNote', function(item, note)
     local Player = QBCore.Functions.GetPlayer(source)
-
-    item.info.evidenceNote = note
-    item.info.noteWrite = Player.PlayerData.charinfo.firstname..' '..Player.PlayerData.charinfo.lastname
-
-    if Player.Functions.RemoveItem('filled_evidence_bag', 1, item.slot) then
-        Player.Functions.AddItem('filled_evidence_bag', 1, item.slot, item.info)
+    if Config.Inventory == 'qb-inventory' or Config.Inventory == 'ps-inventory' then
+        item.info.evidenceNote = note
+        item.info.noteWrite = Player.PlayerData.charinfo.firstname..' '..Player.PlayerData.charinfo.lastname
+        if Inventory.RemoveItem(source, 'filled_evidence_bag', 1, item.slot) then
+            Inventory.AddItem(source,'filled_evidence_bag', 1, item.info, item.slot)
+        end
+    elseif Config.Inventory == 'ox_inventory' then
+        item.metadata.evidenceNote = note
+        item.metadata.noteWrite = Player.PlayerData.charinfo.firstname..' '..Player.PlayerData.charinfo.lastname
+        if Inventory.RemoveItem(source, 'filled_evidence_bag', 1, item.slot) then
+            Inventory.AddItem(source,'filled_evidence_bag', 1, item.metadata, item.slot)
+        end
     end
 end)
 
@@ -1191,38 +1226,57 @@ RegisterNetEvent('police:server:AddRemove', function(itemname, amount, action, s
     if not Player then return end
     if hash ~= seckey then DropPlayer(src, "Attempted exploit abuse") end
     if action == "add" then
-        Player.Functions.AddItem(itemname, amount)
+        Inventory.AddItem(src, itemname, amount)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items[itemname], "add")
     elseif action == "remove" then
-        Player.Functions.RemoveItem(itemname, amount)
+        Inventory.RemoveItem(src, itemname, amount)
         TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items[itemname], "remove")
     end
 end)
 
 RegisterNetEvent('police:server:UpdateEvidenceBag', function(Item, Slot)
-    local Player = QBCore.Functions.GetPlayer(source)
-
     if Item then
-        if Item.info.type == 'casing' then
-            Item.info.serie = Item.info.serie2
-            Item.info.ammotype = Item.info.ammotype2
-        elseif Item.info.type == 'blood' then
-            Item.info.dnalabel = Item.info.dnalabel2
-            Item.info.bloodtype = Item.info.bloodtype2
-        elseif Item.info.type == 'fingerprint' then
-            Item.info.fingerprint = Item.info.fingerprint2
-        elseif Item.info.type == 'bullet' then
-            Item.info.serie = Item.info.serie2
-            Item.info.ammotype = Item.info.ammotype2
-        elseif Item.info.type == 'vehiclefragement' then
-            Item.info.serie = Item.info.serie2
-            Item.info.ammotype = Item.info.ammotype2 
-            Item.info.rgb = Item.info.rgb2
+        if Config.Inventory == 'qb-inventory' or Config.Inventory == 'ps-inventory' then
+            if Item.info.type == 'casing' then
+                Item.info.serie = Item.info.serie2
+                Item.info.ammotype = Item.info.ammotype2
+            elseif Item.info.type == 'bullet' then
+                Item.info.serie = Item.info.serie2
+                Item.info.ammotype = Item.info.ammotype2
+            elseif Item.info.type == 'vehiclefragment' then
+                Item.info.serie = Item.info.serie2
+                Item.info.ammotype = Item.info.ammotype2
+                Item.info.rgb = Item.info.rgb2
+            elseif Item.info.type == 'blood' then
+                Item.info.dnalabel = Item.info.dnalabel2
+                Item.info.bloodtype = Item.info.bloodtype2
+            elseif Item.info.type == 'fingerprint' then
+                Item.info.fingerprint = Item.info.fingerprint2
+            end
+            if Inventory.RemoveItem(source, 'filled_evidence_bag', 1, Slot) then
+                Inventory.AddItem(source, 'filled_evidence_bag', 1, Item.info, Slot)
+            end
+        elseif Config.Inventory == 'ox_inventory' then
+            if Item.metadata.type == 'casing' then
+                Item.metadata.serie = Item.metadata.serie2
+                Item.metadata.ammotype = Item.metadata.ammotype2
+            elseif Item.metadata.type == 'bullet' then
+                Item.metadata.serie = Item.metadata.serie2
+                Item.metadata.ammotype = Item.metadata.ammotype2
+            elseif Item.metadata.type == 'vehiclefragment' then
+                Item.metadata.serie = Item.metadata.serie2
+                Item.metadata.ammotype = Item.metadata.ammotype2
+                Item.metadata.rgb = Item.metadata.rgb2
+            elseif Item.metadata.type == 'blood' then
+                Item.metadata.dnalabel = Item.metadata.dnalabel2
+                Item.metadata.bloodtype = Item.metadata.bloodtype2
+            elseif Item.metadata.type == 'fingerprint' then
+                Item.metadata.fingerprint = Item.metadata.fingerprint2
+            end
+            if Inventory.RemoveItem(source, 'filled_evidence_bag', 1, Slot) then
+                Inventory.AddItem(source, 'filled_evidence_bag', 1, Item.metadata, Slot)
+            end
         end
-    end     
-
-    if Player.Functions.RemoveItem('filled_evidence_bag', 1, Slot) then
-        Player.Functions.AddItem('filled_evidence_bag', 1, Slot, Item.info)
     end
 end)
 

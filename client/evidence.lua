@@ -15,8 +15,8 @@ local CurrentFingerprint = 0
 local Bullethole = {}
 local CurrentBullethole = nil
 
-local Fragements = {}
-local CurrentVehicleFragement = nil
+local Fragments = {}
+local CurrentVehicleFragment = nil
 
 local currentTime = 0
 local r, g, b = 0, 0, 0
@@ -70,7 +70,7 @@ end
 local function SendBulletHole(weapon, raycastcoords, pedcoords, heading, currentTime, entityHit, r, g, b)
     if raycastcoords ~= nil then
         if GetEntityType(entityHit) == 2 then
-            TriggerServerEvent('evidence:server:CreateVehicleFragement', weapon, raycastcoords, pedcoords, heading, currentTime, entityHit, r, g, b)
+            TriggerServerEvent('evidence:server:CreateVehicleFragment', weapon, raycastcoords, pedcoords, heading, currentTime, entityHit, r, g, b)
         else
             TriggerServerEvent('evidence:server:CreateBullethole', weapon, raycastcoords, pedcoords, heading, currentTime)
         end
@@ -148,7 +148,7 @@ AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
             dnalabel = 'DNA',
             bloodtype = 'Blood Type',
             fingerprint = 'Fingerprint',
-            rgb = '',
+            rgb = 'RGB',
         })
     end
 end)
@@ -384,7 +384,7 @@ RegisterNetEvent('evidence:client:ClearBulletholeInArea', function()
 end)
 
 -----------------------------------------[ VEHICLE FRAGEMENTS ]-----------------------------------------
-RegisterNetEvent('evidence:client:AddVehicleFragement', function(vehiclefragementId, weapon, raycastcoords, pedcoords, heading, currentTime, entityHit, r, g, b, serie)
+RegisterNetEvent('evidence:client:AddVehicleFragment', function(vehiclefragmentId, weapon, raycastcoords, pedcoords, heading, currentTime, entityHit, r, g, b, serie)
     if Config.PoliceCreatesEvidence and PlayerJob.type == 'leo' then
         drawLine_r = 0
         drawLine_g = 255
@@ -394,7 +394,7 @@ RegisterNetEvent('evidence:client:AddVehicleFragement', function(vehiclefragemen
         drawLine_g = 0
         drawLine_b = 0
     end
-    Fragements[vehiclefragementId] = {
+    Fragments[vehiclefragmentId] = {
         coords = {
             x = raycastcoords.x,
             y = raycastcoords.y,
@@ -418,41 +418,41 @@ RegisterNetEvent('evidence:client:AddVehicleFragement', function(vehiclefragemen
     }
 end)
 
-RegisterNetEvent('evidence:client:RemoveVehicleFragement', function(vehiclefragementId)
-    Fragements[vehiclefragementId] = nil
-    CurrentVehicleFragement = 0
+RegisterNetEvent('evidence:client:RemoveVehicleFragment', function(vehiclefragmentId)
+    Fragments[vehiclefragmentId] = nil
+    CurrentVehicleFragment = 0
 end)
 
-RegisterNetEvent('evidence:client:ClearVehicleFragementsInArea', function()
+RegisterNetEvent('evidence:client:ClearVehicleFragmentsInArea', function()
     local pos = GetEntityCoords(PlayerPedId())
     local vehiclefragmentList = {}
-    QBCore.Functions.Progressbar('clear_fragements', Lang:t('progressbar.vehicle_fragements'), 5000, false, true, {
+    QBCore.Functions.Progressbar('clear_fragments', Lang:t('progressbar.vehicle_fragments'), 5000, false, true, {
         disableMovement = false,
         disableCarMovement = false,
         disableMouse = false,
         disableCombat = true
     }, {}, {}, {}, function() -- Done
-        if Fragements and next(Fragements) then
-            for vehiclefragementId, _ in pairs(Fragements) do
-                if #(pos - vector3(Fragements[vehiclefragementId].coords.x, Fragements[vehiclefragementId].coords.y, Fragements[vehiclefragementId].coords.z)) <
+        if Fragments and next(Fragments) then
+            for vehiclefragmentId, _ in pairs(Fragments) do
+                if #(pos - vector3(Fragments[vehiclefragmentId].coords.x, Fragments[vehiclefragmentId].coords.y, Fragments[vehiclefragmentId].coords.z)) <
                     10.0 then
-                        vehiclefragmentList[#vehiclefragmentList + 1] = vehiclefragementId
+                        vehiclefragmentList[#vehiclefragmentList + 1] = vehiclefragmentId
                 end
             end
             if Config.Notify == "qb" then
-                QBCore.Functions.Notify(Lang:t('success.vehicle_fragement_removed'), 'success')
+                QBCore.Functions.Notify(Lang:t('success.vehicle_fragment_removed'), 'success')
             elseif Config.Notify == "ox" then
-                lib.notify({ title = 'Evidence', description = Lang:t('success.vehicle_fragement_removed'), duration = 5000, type = 'success' })
+                lib.notify({ title = 'Evidence', description = Lang:t('success.vehicle_fragment_removed'), duration = 5000, type = 'success' })
             else
                 print(Lang:t('error.config_error'))
             end
-            TriggerServerEvent('evidence:server:ClearVehicleFragements', vehiclefragmentList)
+            TriggerServerEvent('evidence:server:ClearVehicleFragments', vehiclefragmentList)
         end
     end, function() -- Cancel
         if Config.Notify == "qb" then
-            QBCore.Functions.Notify(Lang:t('error.vehicle_fragements_not_removed'), 'error')
+            QBCore.Functions.Notify(Lang:t('error.vehicle_fragments_not_removed'), 'error')
         elseif Config.Notify == "ox" then
-            lib.notify({ title = 'Evidence', description = Lang:t('error.vehicle_fragements_not_removed'), duration = 5000, type = 'error' })
+            lib.notify({ title = 'Evidence', description = Lang:t('error.vehicle_fragments_not_removed'), duration = 5000, type = 'error' })
         else
             print(Lang:t('error.config_error'))
         end
@@ -511,15 +511,15 @@ RegisterNetEvent('evidence:client:ClearScene', function()
             end
             TriggerServerEvent('evidence:server:ClearBlooddrops', fingerprintList)
         end
-        if Fragements and next(Fragements) then
-            for vehiclefragementId, _ in pairs(Fragements) do
+        if Fragments and next(Fragments) then
+            for vehiclefragmentId, _ in pairs(Fragments) do
                 if #(pos -
-                        vector3(Fragements[vehiclefragementId].coords.x, Fragements[vehiclefragementId].coords.y, Fragements[vehiclefragementId].coords.z)) <
+                        vector3(Fragments[vehiclefragmentId].coords.x, Fragments[vehiclefragmentId].coords.y, Fragments[vehiclefragmentId].coords.z)) <
                         30.0 then
-                            vehiclefragmentList[#vehiclefragmentList + 1] = vehiclefragementId
+                            vehiclefragmentList[#vehiclefragmentList + 1] = vehiclefragmentId
                 end
             end
-            TriggerServerEvent('evidence:server:ClearVehicleFragements', vehiclefragmentList)
+            TriggerServerEvent('evidence:server:ClearVehicleFragments', vehiclefragmentList)
         end
         if Config.Notify == "qb" then
             QBCore.Functions.Notify(Lang:t('success.crime_scene_removed'), 'success')
@@ -590,15 +590,15 @@ RegisterNetEvent('evidence:client:ClearSceneCrime', function()
             end
             TriggerServerEvent('evidence:server:ClearBlooddrops', fingerprintList)
         end
-        if Fragements and next(Fragements) then
-            for vehiclefragementId, _ in pairs(Fragements) do
+        if Fragments and next(Fragments) then
+            for vehiclefragmentId, _ in pairs(Fragments) do
                 if #(pos -
-                        vector3(Fragements[vehiclefragementId].coords.x, Fragements[vehiclefragementId].coords.y, Fragements[vehiclefragementId].coords.z)) <
+                        vector3(Fragments[vehiclefragmentId].coords.x, Fragments[vehiclefragmentId].coords.y, Fragments[vehiclefragmentId].coords.z)) <
                         30.0 then
-                            vehiclefragmentList[#vehiclefragmentList + 1] = vehiclefragementId
+                            vehiclefragmentList[#vehiclefragmentList + 1] = vehiclefragmentId
                 end
             end
-            TriggerServerEvent('evidence:server:ClearVehicleFragements', vehiclefragmentList)
+            TriggerServerEvent('evidence:server:ClearVehicleFragments', vehiclefragmentList)
         end
         if Config.Notify == "qb" then
             QBCore.Functions.Notify(Lang:t('success.crime_scene_removed'), 'success')
@@ -702,14 +702,14 @@ CreateThread(function()
             end
         end
         -----------------------------[ VEHICLE FRAGEMENTS ]-----------------------------
-        if Fragements and next(Fragements) then
-            for k, v in pairs(Fragements) do
-                CurrentVehicleFragement = k
+        if Fragments and next(Fragments) then
+            for k, v in pairs(Fragments) do
+                CurrentVehicleFragment = k
                 local timer = GetGameTimer()
-                local currentTimer = Fragements[CurrentVehicleFragement].time + RemoveEvidence
-                if timer > Fragements[CurrentVehicleFragement].time + RemoveEvidence and currentTimer ~= RemoveEvidence then
-                    vehiclefragmentList[#vehiclefragmentList + 1] = CurrentVehicleFragement
-                    TriggerServerEvent('evidence:server:ClearVehicleFragements', vehiclefragmentList)
+                local currentTimer = Fragments[CurrentVehicleFragment].time + RemoveEvidence
+                if timer > Fragments[CurrentVehicleFragment].time + RemoveEvidence and currentTimer ~= RemoveEvidence then
+                    vehiclefragmentList[#vehiclefragmentList + 1] = CurrentVehicleFragment
+                    TriggerServerEvent('evidence:server:ClearVehicleFragments', vehiclefragmentList)
                 end
             end
         end
@@ -868,16 +868,16 @@ if Config.PoliceJob == "hi-dev" then
                                 end
                             end
                         end
-                        if next(Fragements) then
+                        if next(Fragments) then
                             local pos = GetEntityCoords(PlayerPedId(), true)
-                            for k, v in pairs(Fragements) do
+                            for k, v in pairs(Fragments) do
                                 local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
                                 local raycastdist = #(coords - vector3(v.coords.x, v.coords.y, v.coords.z))
                                 if dist < 20 then
-                                    CurrentVehicleFragement = k
+                                    CurrentVehicleFragment = k
                                     if GetEntityType(entityHit) then
                                         if dist < 7.5 and dist > 1.5 then
-                                            DrawText3D(v.coords.x, v.coords.y, v.coords.z +0.05, Lang:t('info.vehicle_fragement'))
+                                            DrawText3D(v.coords.x, v.coords.y, v.coords.z +0.05, Lang:t('info.vehicle_fragment'))
                                         end
                                         DrawMarker(36, v.coords.x, v.coords.y, v.coords.z -0.05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.3, 0.2, v.r, v.g, v.b, 220, false, true, 2, nil, nil, false)
                                     end
@@ -892,17 +892,17 @@ if Config.PoliceJob == "hi-dev" then
                                                 streetLabel = streetLabel .. ' | ' .. street2
                                             end
                                             local info = {
-                                                label = Lang:t('info.bullet'),
-                                                type = 'vehiclefragement',
+                                                label = Lang:t('info.vehicle_fragment'),
+                                                type = 'vehiclefragment',
                                                 street = streetLabel:gsub("%'", ''),
                                                 rgb = Lang:t('info.unknown'),
                                                 rgb2 = "R: " ..v.r.. " / G: " ..v.g.. " / B: " ..v.b,
                                                 ammotype = Lang:t('info.unknown'),
-                                                ammotype2 = Fragements[CurrentVehicleFragement].type,
+                                                ammotype2 = Fragments[CurrentVehicleFragment].type,
                                                 serie = Lang:t('info.unknown'),
-                                                serie2 = Fragements[CurrentVehicleFragement].serie,
+                                                serie2 = Fragments[CurrentVehicleFragment].serie,
                                             }
-                                            TriggerServerEvent('evidence:server:AddFragementToInventory', CurrentVehicleFragement, info)
+                                            TriggerServerEvent('evidence:server:AddFragmentToInventory', CurrentVehicleFragment, info)
                                         end
                                     end
                                 end
@@ -1061,16 +1061,16 @@ elseif Config.PoliceJob == "qb" then
                                 end
                             end
                         end
-                        if next(Fragements) then
+                        if next(Fragments) then
                             local pos = GetEntityCoords(PlayerPedId(), true)
-                            for k, v in pairs(Fragements) do
+                            for k, v in pairs(Fragments) do
                                 local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
                                 local raycastdist = #(coords - vector3(v.coords.x, v.coords.y, v.coords.z))
                                 if dist < 20 then
-                                    CurrentVehicleFragement = k
+                                    CurrentVehicleFragment = k
                                     if GetEntityType(entityHit) then
                                         if dist < 7.5 and dist > 1.5 then
-                                            DrawText3D(v.coords.x, v.coords.y, v.coords.z +0.05, Lang:t('info.vehicle_fragement'))
+                                            DrawText3D(v.coords.x, v.coords.y, v.coords.z +0.05, Lang:t('info.vehicle_fragment'))
                                         end
                                         DrawMarker(36, v.coords.x, v.coords.y, v.coords.z -0.05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.3, 0.2, v.r, v.g, v.b, 220, false, true, 2, nil, nil, false)
                                     end
@@ -1085,14 +1085,14 @@ elseif Config.PoliceJob == "qb" then
                                                 streetLabel = streetLabel .. ' | ' .. street2
                                             end
                                             local info = {
-                                                label = Lang:t('info.bullet'),
-                                                type = 'vehiclefragement',
+                                                label = Lang:t('info.vehicle_fragment'),
+                                                type = 'vehiclefragment',
                                                 street = streetLabel:gsub("%'", ''),
                                                 rgb = "R: " ..v.r.. " / G: " ..v.g.. " / B: " ..v.b,
-                                                ammotype = Fragements[CurrentVehicleFragement].type,
-                                                serie = Fragements[CurrentVehicleFragement].serie,
+                                                ammotype = Fragments[CurrentVehicleFragment].type,
+                                                serie = Fragments[CurrentVehicleFragment].serie,
                                             }
-                                            TriggerServerEvent('evidence:server:AddFragementToInventory', CurrentVehicleFragement, info)
+                                            TriggerServerEvent('evidence:server:AddFragmentToInventory', CurrentVehicleFragment, info)
                                         end
                                     end
                                 end
@@ -1166,12 +1166,12 @@ RegisterNetEvent('evidence:client:toggleDrawLine', function()
                             end
                         end
                     end
-                    if next(Fragements) then
+                    if next(Fragments) then
                         local pos = GetEntityCoords(PlayerPedId(), true)
-                        for k, v in pairs(Fragements) do
+                        for k, v in pairs(Fragments) do
                             local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
                             if dist < 20 then
-                                CurrentVehicleFragement = k
+                                CurrentVehicleFragment = k
                                 DrawLine(v.coords.x, v.coords.y, v.coords.z -0.05, v.pedcoord.x, v.pedcoord.y, v.pedcoord.z, v.drawLine_r, v.drawLine_g, v.drawLine_b, 255)
                             end
                         end
