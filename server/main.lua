@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------[ VARIABLES ]------------------------------------------------------------------------------
 local Casings = {}
 local Bullethole = {}
-local Fragements = {}
+local Fragments = {}
 local BloodDrops = {}
 local FingerDrops = {}
 local QBCore = exports['qb-core']:GetCoreObject()
@@ -60,16 +60,16 @@ local function CreateBulletholeId()
     end
 end
 
-local function CreateVehicleFragementId()
-    if VehicleFragement then
-        local fragementId = math.random(10000, 99999)
-        while VehicleFragement[fragementId] do
-            fragementId = math.random(10000, 99999)
+local function CreateVehicleFragmentId()
+    if VehicleFragment then
+        local fragmentId = math.random(10000, 99999)
+        while VehicleFragment[fragmentId] do
+            fragmentId = math.random(10000, 99999)
         end
-        return fragementId
+        return fragmentId
     else
-        local fragementId = math.random(10000, 99999)
-        return fragementId
+        local fragmentId = math.random(10000, 99999)
+        return fragmentId
     end
 end
 
@@ -118,13 +118,13 @@ if Config.Commands then
         end
     end)
 
-    lib.addCommand('clearfragements', {
-        help = Lang:t('commands.clear_fragements')
+    lib.addCommand('clearfragments', {
+        help = Lang:t('commands.clear_fragments')
     }, function(source, raw)
         local src = source
         local Player = QBCore.Functions.GetPlayer(src)
         if Player.PlayerData.job.type == 'leo' and Player.PlayerData.job.onduty then
-            TriggerClientEvent('evidence:client:ClearVehicleFragementsInArea', src)
+            TriggerClientEvent('evidence:client:ClearVehicleFragmentsInArea', src)
         else
             if Config.Notify == "qb" then
                 TriggerClientEvent('QBCore:Notify', src, Lang:t('error.on_duty_police_only'), 'error')
@@ -500,10 +500,10 @@ RegisterNetEvent('evidence:server:AddBulletToInventory', function(bulletholeId, 
 end)
 
 -----------------------------------------[ VEHICLE FRAGEMENTS ]-----------------------------------------
-RegisterNetEvent('evidence:server:CreateVehicleFragement', function(weapon, raycastcoords, pedcoords, heading, currentTime, entityHit, r, g, b)
+RegisterNetEvent('evidence:server:CreateVehicleFragment', function(weapon, raycastcoords, pedcoords, heading, currentTime, entityHit, r, g, b)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
-    local vehiclefragementId = CreateVehicleFragementId()
+    local vehiclefragmentId = CreateVehicleFragmentId()
     local weaponInfo = QBCore.Shared.Weapons[weapon]
     local serieNumber = nil
     if Config.Inventory == "ox" then
@@ -523,44 +523,44 @@ RegisterNetEvent('evidence:server:CreateVehicleFragement', function(weapon, rayc
             end
         end
     end
-    TriggerClientEvent('evidence:client:AddVehicleFragement', -1, vehiclefragementId, weapon, raycastcoords, pedcoords, heading, currentTime, entityHit, r, g, b, serieNumber)
+    TriggerClientEvent('evidence:client:AddVehicleFragment', -1, vehiclefragmentId, weapon, raycastcoords, pedcoords, heading, currentTime, entityHit, r, g, b, serieNumber)
 end)
 
-RegisterNetEvent('evidence:server:ClearVehicleFragements', function(vehiclefragmentList)
+RegisterNetEvent('evidence:server:ClearVehicleFragments', function(vehiclefragmentList)
     if vehiclefragmentList and next(vehiclefragmentList) then
         for _, v in pairs(vehiclefragmentList) do
-            TriggerClientEvent('evidence:client:RemoveVehicleFragement', -1, v)
-            Fragements[v] = nil
+            TriggerClientEvent('evidence:client:RemoveVehicleFragment', -1, v)
+            Fragments[v] = nil
         end
     end
 end)
 
-RegisterNetEvent('evidence:server:AddFragementToInventory', function(vehiclefragementId, fragementInfo)
+RegisterNetEvent('evidence:server:AddFragmentToInventory', function(vehiclefragmentId, fragmentInfo)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     if Player.Functions.RemoveItem('empty_evidence_bag', 1) then
         TriggerClientEvent('evidence:client:PlayerPickUpAnimation', src)
         if Config.Inventory == "ox" then
             local info = {}
-            info.label = fragementInfo.label
-            info.type = fragementInfo.type
-            info.street = fragementInfo.street
-            info.rgb = fragementInfo.rgb
-            info.rgb2 = fragementInfo.rgb2
-            info.ammotype = fragementInfo.ammotype
-            info.ammotype2 = fragementInfo.ammotype2
-            info.serie = fragementInfo.serie
-            info.serie2 = fragementInfo.serie2
+            info.label = fragmentInfo.label
+            info.type = fragmentInfo.type
+            info.street = fragmentInfo.street
+            info.rgb = fragmentInfo.rgb
+            info.rgb2 = fragmentInfo.rgb2
+            info.ammotype = fragmentInfo.ammotype
+            info.ammotype2 = fragmentInfo.ammotype2
+            info.serie = fragmentInfo.serie
+            info.serie2 = fragmentInfo.serie2
             if exports.ox_inventory:CanCarryItem(src, 'filled_evidence_bag', 1) then
                 exports.ox_inventory:AddItem(src, 'filled_evidence_bag', 1, info)
             end
-            TriggerClientEvent('evidence:client:RemoveVehicleFragement', -1, vehiclefragementId)
-            Fragements[vehiclefragementId] = nil
+            TriggerClientEvent('evidence:client:RemoveVehicleFragment', -1, vehiclefragmentId)
+            Fragments[vehiclefragmentId] = nil
         else
-        if Player.Functions.AddItem('filled_evidence_bag', 1, false, fragementInfo) then
+        if Player.Functions.AddItem('filled_evidence_bag', 1, false, fragmentInfo) then
             TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['filled_evidence_bag'], 'add')
-            TriggerClientEvent('evidence:client:RemoveVehicleFragement', -1, vehiclefragementId)
-            Fragements[vehiclefragementId] = nil
+            TriggerClientEvent('evidence:client:RemoveVehicleFragment', -1, vehiclefragmentId)
+            Fragments[vehiclefragmentId] = nil
         end
     end
     else
