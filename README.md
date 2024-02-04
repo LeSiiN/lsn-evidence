@@ -226,6 +226,8 @@ examine_menu_bullet_b = "By examining the ammunition fragment you can determine 
 examine_menu_frags_h = "Vehicle fragment",
 examine_menu_frags_b = "By examining the vehicle fragment you can determine the model and serial number of the vehicle",
 ```
+# If using ox_inventory with qb-core or qbox do this:
+- head to shared/weapons.lua and change the ammo type to match the ammo type in ox_inventory ox_inventory/data/weapons.lua.
 
 ## 💰 You can help me by Donating
 [![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/LeSiiN)
