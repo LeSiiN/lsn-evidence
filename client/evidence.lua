@@ -383,7 +383,7 @@ RegisterNetEvent('evidence:client:ClearBulletholeInArea', function()
     end)
 end)
 
------------------------------------------[ VEHICLE FRAGEMENTS ]-----------------------------------------
+-----------------------------------------[ VEHICLE FRAGMENTS ]-----------------------------------------
 RegisterNetEvent('evidence:client:AddVehicleFragment', function(vehiclefragmentId, weapon, raycastcoords, pedcoords, heading, currentTime, entityHit, r, g, b, serie)
     if Config.PoliceCreatesEvidence and PlayerJob.type == 'leo' then
         drawLine_r = 0
@@ -701,7 +701,7 @@ CreateThread(function()
                 end
             end
         end
-        -----------------------------[ VEHICLE FRAGEMENTS ]-----------------------------
+        -----------------------------[ VEHICLE FRAGMENTS ]-----------------------------
         if Fragments and next(Fragments) then
             for k, v in pairs(Fragments) do
                 CurrentVehicleFragment = k
@@ -737,7 +737,7 @@ if Config.PoliceJob == "hi-dev" then
                                         DrawText3D(v.coords.x, v.coords.y, v.coords.z +0.1, " ~b~Bullet Casing [ " ..Config.AmmoLabels[QBCore.Shared.Weapons[Casings[CurrentCasing].type]['ammotype']].. " ]~s~")
                                     elseif raycastdist < 0.25 and dist < 5 then
                                         DrawText3D(v.coords.x, v.coords.y, v.coords.z  -0.05, Lang:t('info.bullet_casing'))
-                                        if IsControlJustReleased(0, 23) then
+                                        if IsControlJustReleased(0, Config.EvidencePickupButton) then
                                             local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
                                             local street1 = GetStreetNameFromHashKey(s1)
                                             local street2 = GetStreetNameFromHashKey(s2)
@@ -773,7 +773,7 @@ if Config.PoliceJob == "hi-dev" then
                                         DrawText3D(v.coords.x, v.coords.y, v.coords.z +0.1, "~r~Blood [ "..DnaHash(Blooddrops[CurrentBlooddrop].citizenid).." ]~s~")
                                     elseif raycastdist < 0.25 and dist < 5 then
                                         DrawText3D(v.coords.x, v.coords.y, v.coords.z -0.05, Lang:t('info.blood_text', { value = DnaHash(Blooddrops[CurrentBlooddrop].citizenid) }))
-                                        if IsControlJustReleased(0, 23) then
+                                        if IsControlJustReleased(0, Config.EvidencePickupButton) then
                                             local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
                                             local street1 = GetStreetNameFromHashKey(s1)
                                             local street2 = GetStreetNameFromHashKey(s2)
@@ -808,7 +808,7 @@ if Config.PoliceJob == "hi-dev" then
                                         DrawText3D(v.coords.x, v.coords.y, v.coords.z +0.1, "~y~Fingerprint [ "..Fingerprints[CurrentFingerprint].fingerprint.." ]~s~")
                                     elseif raycastdist < 0.25 and dist < 5 then
                                         DrawText3D(v.coords.x, v.coords.y, v.coords.z -0.05, Lang:t('info.fingerprint_text'))
-                                        if IsControlJustReleased(0, 23) then
+                                        if IsControlJustReleased(0, Config.EvidencePickupButton) then
                                             local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
                                             local street1 = GetStreetNameFromHashKey(s1)
                                             local street2 = GetStreetNameFromHashKey(s2)
@@ -843,7 +843,7 @@ if Config.PoliceJob == "hi-dev" then
                                     end
                                     if raycastdist < 0.25 and dist < 2.5 then
                                         DrawText3D(v.coords.x, v.coords.y, v.coords.z  -0.05, Lang:t('info.bullet_casing'))
-                                        if IsControlJustReleased(0, 23) then
+                                        if IsControlJustReleased(0, Config.EvidencePickupButton) then
                                             local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
                                             local street1 = GetStreetNameFromHashKey(s1)
                                             local street2 = GetStreetNameFromHashKey(s2)
@@ -883,7 +883,7 @@ if Config.PoliceJob == "hi-dev" then
                                     end
                                     if dist < 1.5 then
                                         DrawText3D(v.coords.x, v.coords.y, v.coords.z  -0.05, Lang:t('info.bullet_casing'))
-                                        if IsControlJustReleased(0, 23) then
+                                        if IsControlJustReleased(0, Config.EvidencePickupButton) then
                                             local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
                                             local street1 = GetStreetNameFromHashKey(s1)
                                             local street2 = GetStreetNameFromHashKey(s2)
@@ -937,7 +937,7 @@ elseif Config.PoliceJob == "qb" then
                                         DrawText3D(v.coords.x, v.coords.y, v.coords.z +0.1, " ~b~Bullet Casing [ " ..Config.AmmoLabels[QBCore.Shared.Weapons[Casings[CurrentCasing].type]['ammotype']].. " ]~s~")
                                     elseif raycastdist < 0.25 and dist < 5 then
                                         DrawText3D(v.coords.x, v.coords.y, v.coords.z  -0.05, Lang:t('info.bullet_casing'))
-                                        if IsControlJustReleased(0, 23) then
+                                        if IsControlJustReleased(0, Config.EvidencePickupButton) then
                                             local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
                                             local street1 = GetStreetNameFromHashKey(s1)
                                             local street2 = GetStreetNameFromHashKey(s2)
@@ -971,7 +971,7 @@ elseif Config.PoliceJob == "qb" then
                                         DrawText3D(v.coords.x, v.coords.y, v.coords.z +0.1, "~r~Blood [ "..DnaHash(Blooddrops[CurrentBlooddrop].citizenid).." ]~s~")
                                     elseif raycastdist < 0.25 and dist < 5 then
                                         DrawText3D(v.coords.x, v.coords.y, v.coords.z -0.05, Lang:t('info.blood_text', { value = DnaHash(Blooddrops[CurrentBlooddrop].citizenid) }))
-                                        if IsControlJustReleased(0, 23) then
+                                        if IsControlJustReleased(0, Config.EvidencePickupButton) then
                                             local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
                                             local street1 = GetStreetNameFromHashKey(s1)
                                             local street2 = GetStreetNameFromHashKey(s2)
@@ -1004,7 +1004,7 @@ elseif Config.PoliceJob == "qb" then
                                         DrawText3D(v.coords.x, v.coords.y, v.coords.z +0.1, "~y~Fingerprint [ "..Fingerprints[CurrentFingerprint].fingerprint.." ]~s~")
                                     elseif raycastdist < 0.25 and dist < 5 then
                                         DrawText3D(v.coords.x, v.coords.y, v.coords.z -0.05, Lang:t('info.fingerprint_text'))
-                                        if IsControlJustReleased(0, 23) then
+                                        if IsControlJustReleased(0, Config.EvidencePickupButton) then
                                             local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
                                             local street1 = GetStreetNameFromHashKey(s1)
                                             local street2 = GetStreetNameFromHashKey(s2)
@@ -1038,7 +1038,7 @@ elseif Config.PoliceJob == "qb" then
                                     end
                                     if raycastdist < 0.25 and dist < 2.5 then
                                         DrawText3D(v.coords.x, v.coords.y, v.coords.z  -0.05, Lang:t('info.bullet_casing'))
-                                        if IsControlJustReleased(0, 23) then
+                                        if IsControlJustReleased(0, Config.EvidencePickupButton) then
                                             local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
                                             local street1 = GetStreetNameFromHashKey(s1)
                                             local street2 = GetStreetNameFromHashKey(s2)
@@ -1076,7 +1076,7 @@ elseif Config.PoliceJob == "qb" then
                                     end
                                     if dist < 1.5 then
                                         DrawText3D(v.coords.x, v.coords.y, v.coords.z  -0.05, Lang:t('info.bullet_casing'))
-                                        if IsControlJustReleased(0, 23) then
+                                        if IsControlJustReleased(0, Config.EvidencePickupButton) then
                                             local s1, s2 = GetStreetNameAtCoord(v.coords.x, v.coords.y, v.coords.z)
                                             local street1 = GetStreetNameFromHashKey(s1)
                                             local street2 = GetStreetNameFromHashKey(s2)
