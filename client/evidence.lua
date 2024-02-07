@@ -120,7 +120,7 @@ local function DrawLineDisableNotify()
     if Config.Notify == "qb" then
         QBCore.Functions.Notify(Lang:t('error.drawLine_disabled'), 'error')
     elseif Config.Notify == "ox" then
-        lib.notify({ title = 'Evidence', description = Lang:t('error.error.drawLine_disabled'), duration = 5000, type = 'error' })
+        lib.notify({ title = 'Evidence', description = Lang:t('error.drawLine_disabled'), duration = 5000, type = 'error' })
     else
         print(Lang:t('error.config_error'))
     end
@@ -1118,7 +1118,7 @@ RegisterNetEvent('evidence:client:toggleDrawLine', function()
         if Config.Notify == "qb" then
             QBCore.Functions.Notify(Lang:t('error.drawLine_enabled'), 'success')
         elseif Config.Notify == "ox" then
-            lib.notify({ title = 'Evidence', description = Lang:t('error.error.drawLine_drawLine_enabled'), duration = 5000, type = 'success' })
+            lib.notify({ title = 'Evidence', description = Lang:t('error.drawLine_enabled'), duration = 5000, type = 'success' })
         else
             print(Lang:t('error.config_error'))
         end
@@ -1137,7 +1137,7 @@ RegisterNetEvent('evidence:client:toggleDrawLine', function()
                             if Config.Notify == "qb" then
                                 QBCore.Functions.Notify(Lang:t('error.drawLine_weapon_in_hand'), 'error')
                             elseif Config.Notify == "ox" then
-                                lib.notify({ title = 'Evidence', description = Lang:t('error.error.drawLine_weapon_in_hand'), duration = 5000, type = 'error' })
+                                lib.notify({ title = 'Evidence', description = Lang:t('error.drawLine_weapon_in_hand'), duration = 5000, type = 'error' })
                             else
                                 print(Lang:t('error.config_error'))
                             end
@@ -1157,7 +1157,7 @@ RegisterNetEvent('evidence:client:toggleDrawLine', function()
                                 if Config.Notify == "qb" then
                                     QBCore.Functions.Notify(Lang:t('error.drawLine_too_far_away'), 'error')
                                 elseif Config.Notify == "ox" then
-                                    lib.notify({ title = 'Evidence', description = Lang:t('error.error.drawLine_too_far_away'), duration = 5000, type = 'error' })
+                                    lib.notify({ title = 'Evidence', description = Lang:t('error.drawLine_too_far_away'), duration = 5000, type = 'error' })
                                 else
                                     print(Lang:t('error.config_error'))
                                 end
