@@ -22,6 +22,10 @@ Config.Inventory = "qb" -- "qb" for qb/ps/lj-inventory    or    "ox" for ox_inve
 ---------[ WARNING: Dont make this to low, otherwise Cops cant really do anything to make a Report ]---------
 Config.RemoveEvidence = 45
 
+---------[ Change the Keybind to Pickup Evidence ]---------
+Config.EvidencePickupButton = 38 -- 'E' key ('F' key = 23)
+Config.EvidencePickupButtonString = 'E' -- Set the string of the key you choose here (for drawtext locale)
+
 
 Config.AmmoLabels = {
     ['AMMO_PISTOL'] = '9x19mm',
