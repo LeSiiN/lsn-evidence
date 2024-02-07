@@ -26,7 +26,7 @@ Config.RemoveEvidence = 45
 Config.EvidencePickupButton = 38 -- 'E' key ('F' key = 23)
 Config.EvidencePickupButtonString = 'E' -- Set the string of the key you choose here (for drawtext locale)
 
----------[ Change the Colour of the Casing Markers ]---------
+
 Config.AmmoLabels = {
     ['AMMO_PISTOL'] = '9x19mm',
     ['AMMO_SMG'] = '9x19mm',
