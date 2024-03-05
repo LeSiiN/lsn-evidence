@@ -230,15 +230,6 @@ QBCore.Functions.CreateUseableItem("evidencecleaningkit", function(source)
         end
     end
 end)
-
-if Config.ShowShootersLine then
-    QBCore.Functions.CreateUseableItem("policepointer", function(source)
-        local src = source
-        local Player = QBCore.Functions.GetPlayer(src)
-        if not Player then return end
-        TriggerClientEvent('evidence:client:toggleDrawLine', src)
-    end)
-end
 ------------------------------------------------------------------------------[ EVENTS ]------------------------------------------------------------------------------
 
 -----------------------------------------[ BLOOD ]-----------------------------------------
@@ -499,7 +490,7 @@ RegisterNetEvent('evidence:server:AddBulletToInventory', function(bulletholeId, 
     end
 end)
 
------------------------------------------[ VEHICLE FRAGMENTS ]-----------------------------------------
+-----------------------------------------[ VEHICLE FRAGEMENTS ]-----------------------------------------
 RegisterNetEvent('evidence:server:CreateVehicleFragment', function(weapon, raycastcoords, pedcoords, heading, currentTime, entityHit, r, g, b)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)

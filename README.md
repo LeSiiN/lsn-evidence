@@ -11,7 +11,6 @@
 - Evidence can be checked via weapon_flashlight ( can be picked up )
 - Criminals can remove evidence
 - Also work when Player is using a Camera ( must be playing a specific animation )
-- By using the Laserpointer near a Bullethole u can see the DrawLines of each shoot
 - Evidence automatically removes after 45Min. (Performance thing)
 
 # Commands ( OPTIONAL )
@@ -46,7 +45,6 @@ ensure lsn-evidence
 ```
 rag                         = { name = 'rag', label = 'Rag', weight = 100, type = 'item', image = 'rag.png', unique = false, useable = true, shouldClose = true, combinable = nil, description = 'Could get Handy.' },
 evidencecleaningkit         = { name = 'evidencecleaningkit', label = 'Evidence Cleaning Kit', weight = 250, type = 'item', image = 'cleaningkit.png', unique = false, useable = true, shouldClose = true, combinable = nil, description = 'Cleans every Evidence near a police Officer.' },
-policepointer         = { name = 'policepointer', label = 'Laserpointer', weight = 250, type = 'item', image = 'laserpointer.png', unique = true, useable = true, shouldClose = true, combinable = nil, description = 'Can be placed inside Bulletholes.' },
 ```
 </details>
 
@@ -55,7 +53,6 @@ policepointer         = { name = 'policepointer', label = 'Laserpointer', weight
 ```
 ["rag"]                          = { ["name"] = 'rag', ["label"] = 'Rag', ["weight"] = 100, ["type"] = 'item', ["image"] = 'rag.png', ["unique"] = false, ["useable"] = true, ["shouldClose"] = true, ["combinable"] = nil, ["description"] = 'Could get Handy.' },
 ["evidencecleaningkit"]          = { ["name"] = 'evidencecleaningkit', ["label"] = 'Evidence Cleaning Kit', ["weight"] = 250, ["type"] = 'item', ["image"] = 'cleaningkit.png', ["unique"] = false, ["useable"] = true, ["shouldClose"] = true, ["combinable"] = nil, ["description"] = 'Cleans every Evidence near a police Officer.' },
-["policepointer"]                = { ["name"] = 'policepointer', ["label"] = 'Laserpointer', ["weight"] = 250, ["type"] = 'item', ["image"] = 'laserpointer.png', ["unique"] = true, ["useable"] = true, ["shouldClose"] = true, ["combinable"] = nil, ["description"] = 'Can be placed inside Bulletholes.' },
 ```
 </details>
 
@@ -226,8 +223,6 @@ examine_menu_bullet_b = "By examining the ammunition fragment you can determine 
 examine_menu_frags_h = "Vehicle fragment",
 examine_menu_frags_b = "By examining the vehicle fragment you can determine the model and serial number of the vehicle",
 ```
-# If using ox_inventory with qb-core or qbox do this:
-- head to shared/weapons.lua and change the ammo type to match the ammo type in ox_inventory ox_inventory/data/weapons.lua.
 
 ## 💰 You can help me by Donating
 [![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/LeSiiN)
