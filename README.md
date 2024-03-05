@@ -24,7 +24,6 @@
 # New Items
 - rag - Allows Criminals to delete nearby Evidence.
 - evidencecleaningkit - Allows Police Officers to remove evidence. ( No need for the commands then )
-- policepointer - Allows Police Officers to see the DrawLines.
 
 # Dependencies
 - [qb-core](https://github.com/qbcore-framework/qb-core)
