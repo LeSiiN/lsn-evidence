@@ -564,3 +564,8 @@ RegisterNetEvent('evidence:server:AddFragmentToInventory', function(vehiclefragm
         end
     end
 end)
+
+-----------------------------------------[ deleteEvidence Logic ]-----------------------------------------
+lib.cron.new('*/1 * * * *', function()
+    TriggerClientEvent("evidence:client:deleteEvidence", -1)
+end)
