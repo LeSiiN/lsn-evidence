@@ -31,6 +31,11 @@ Config.AmmoLabels = {
     ['AMMO_SNIPER'] = 'Large caliber',
 }
 
+Config.EvidenceDelay = 200 -- in ms  //  Delay between each evidence drop (Higher number less evidence drops)
+Config.TimerName = {
+    Evidence = true
+}
+
 ---------[ These are the Events that can be added to ANY Client to make people drop Finger/Blood Drops. ]---------
 --TriggerServerEvent("evidence:server:CreateFingerDrop", pos)
 --TriggerServerEvent('evidence:server:CreateBloodDrop', QBCore.Functions.GetPlayerData().citizenid, QBCore.Functions.GetPlayerData().metadata['bloodtype'], coords)
