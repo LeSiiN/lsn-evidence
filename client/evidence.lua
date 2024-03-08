@@ -24,6 +24,8 @@ local r, g, b = 0, 0, 0
 local drawLine_r, drawLine_g, drawLine_b = 0, 0, 0
 local FingerprintsList = {}
 
+local timer = {}
+
 local WhitelistedWeapons = {
     `weapon_unarmed`,
     `weapon_snowball`,
@@ -126,6 +128,16 @@ local function DrawLineDisableNotify()
     end
 end
 
+local function WaitTimer(name, action, ...)
+    if not Config.TimerName[name] then return end
+
+    if not timer[name] then
+        timer[name] = true
+        action(...)
+        Wait(Config.EvidenceDelay)
+        timer[name] = false
+    end
+end
 ------------------------------------------------------------------------------[ EVENTS ]------------------------------------------------------------------------------
 AddEventHandler('onResourceStart', function(resourceName)
     if GetCurrentResourceName() == resourceName then
@@ -600,17 +612,17 @@ RegisterNetEvent('evidence:client:ClearSceneCrime', function()
     end)
 end)
 
-------------------------------------------------------------------------------[ THREADS ]------------------------------------------------------------------------------
+------------------------------------------------------------------------------[ WAS THREADS AT SOME POINT ]------------------------------------------------------------------------------
 
 -----------------------------------------[ DROP EVIDENCE ]-----------------------------------------
-CreateThread(function()
-    while true do
-        Wait(3)
+AddEventHandler('CEventGunShot', function(witnesses, ped)
+    WaitTimer('Evidence', function()
+        if cache.ped ~= ped then return end
+
         if PlayerJob.type == 'leo' and not Config.PoliceCreatesEvidence then return end
-        local ped = PlayerPedId()
         if IsPedShooting(ped) then
-            local pedcoords = GetEntityCoords(PlayerPedId())
-            local heading = GetEntityHeading(PlayerPedId())
+            local pedcoords = GetEntityCoords(ped)
+            local heading = GetEntityHeading(ped)
 
             local hit, raycastcoords, entityHit = RayCastGamePlayCamera(1000.0)
             local weapon = GetSelectedPedWeapon(ped)
@@ -622,100 +634,112 @@ CreateThread(function()
                 DropBulletCasing(weapon, ped, currentTime)
             end
         end
-    end
+    end)
 end)
 
------------------------------------------[ REMOVE EVIDENCE AFTER 30 MINS ]-----------------------------------------
-CreateThread(function()
-    while true do
-        Wait(60000)
-        local bulletholeList = {}
-        local casingList = {}
-        local blooddropList = {}
-        local fingerprintList = {}
-        local vehiclefragmentList = {}
-        local RemoveEvidence = Config.RemoveEvidence * 60 * 1000
-        -----------------------------[ CASINGS ]-----------------------------
-        if Casings and next(Casings) then
-            for k, v in pairs(Casings) do
-                CurrentCasing = k
-                local timer = GetGameTimer()
-                local currentTimer = Casings[CurrentCasing].time + RemoveEvidence
-                if timer > Casings[CurrentCasing].time + RemoveEvidence and currentTimer ~= RemoveEvidence then
-                    casingList[#casingList + 1] = CurrentCasing
-                    TriggerServerEvent('evidence:server:ClearCasings', casingList)
-                end
+-----------------------------------------[ REMOVE EVIDENCE ]-----------------------------------------
+RegisterNetEvent('evidence:client:deleteEvidence', function()
+    local bulletholeList = {}
+    local casingList = {}
+    local blooddropList = {}
+    local fingerprintList = {}
+    local vehiclefragmentList = {}
+    local RemoveEvidence = Config.RemoveEvidence * 60 * 1000
+    -----------------------------[ CASINGS ]-----------------------------
+    if Casings and next(Casings) then
+        for k, v in pairs(Casings) do
+            CurrentCasing = k
+            local timer = GetGameTimer()
+            local currentTimer = Casings[CurrentCasing].time + RemoveEvidence
+            if timer > Casings[CurrentCasing].time + RemoveEvidence and currentTimer ~= RemoveEvidence then
+                casingList[#casingList + 1] = CurrentCasing
+                TriggerServerEvent('evidence:server:ClearCasings', casingList)
             end
         end
-        -----------------------------[ BLOOD ]-----------------------------
-        if Blooddrops and next(Blooddrops) then
-            for k, v in pairs(Blooddrops) do
-                CurrentBlooddrop = k
-                local timer = GetGameTimer()
-                local currentTimer = Blooddrops[CurrentBlooddrop].time + RemoveEvidence
-                if timer > Blooddrops[CurrentBlooddrop].time + RemoveEvidence and currentTimer ~= RemoveEvidence then
-                    blooddropList[#blooddropList + 1] = CurrentBlooddrop
-                    TriggerServerEvent('evidence:server:ClearBlooddrops', blooddropList)
-                end
+    end
+    -----------------------------[ BLOOD ]-----------------------------
+    if Blooddrops and next(Blooddrops) then
+        for k, v in pairs(Blooddrops) do
+            CurrentBlooddrop = k
+            local timer = GetGameTimer()
+            local currentTimer = Blooddrops[CurrentBlooddrop].time + RemoveEvidence
+            if timer > Blooddrops[CurrentBlooddrop].time + RemoveEvidence and currentTimer ~= RemoveEvidence then
+                blooddropList[#blooddropList + 1] = CurrentBlooddrop
+                TriggerServerEvent('evidence:server:ClearBlooddrops', blooddropList)
             end
         end
-        -----------------------------[ FINGERPRINTS ]-----------------------------
-        if Fingerprints and next(Fingerprints) then
-            for k, v in pairs(Fingerprints) do
-                CurrentFingerprint = k
-                local timer = GetGameTimer()
-                local currentTimer = Fingerprints[CurrentFingerprint].time + RemoveEvidence
-                if timer > Fingerprints[CurrentFingerprint].time + RemoveEvidence and currentTimer ~= RemoveEvidence then
-                    fingerprintList[#fingerprintList + 1] = CurrentFingerprint
-                    TriggerServerEvent('evidence:server:ClearFingerprints', fingerprintList)
-                end
+    end
+    -----------------------------[ FINGERPRINTS ]-----------------------------
+    if Fingerprints and next(Fingerprints) then
+        for k, v in pairs(Fingerprints) do
+            CurrentFingerprint = k
+            local timer = GetGameTimer()
+            local currentTimer = Fingerprints[CurrentFingerprint].time + RemoveEvidence
+            if timer > Fingerprints[CurrentFingerprint].time + RemoveEvidence and currentTimer ~= RemoveEvidence then
+                fingerprintList[#fingerprintList + 1] = CurrentFingerprint
+                TriggerServerEvent('evidence:server:ClearFingerprints', fingerprintList)
             end
         end
-        -----------------------------[ BULLETHOLE ]-----------------------------
-        if Bullethole and next(Bullethole) then
-            for k, v in pairs(Bullethole) do
-                CurrentBullethole = k
-                local timer = GetGameTimer()
-                local currentTimer = Bullethole[CurrentBullethole].time + RemoveEvidence
-                if timer > Bullethole[CurrentBullethole].time + RemoveEvidence and currentTimer ~= RemoveEvidence then
-                    bulletholeList[#bulletholeList + 1] = CurrentBullethole
-                    TriggerServerEvent('evidence:server:ClearBullethole', bulletholeList)
-                end
+    end
+    -----------------------------[ BULLETHOLE ]-----------------------------
+    if Bullethole and next(Bullethole) then
+        for k, v in pairs(Bullethole) do
+            CurrentBullethole = k
+            local timer = GetGameTimer()
+            local currentTimer = Bullethole[CurrentBullethole].time + RemoveEvidence
+            if timer > Bullethole[CurrentBullethole].time + RemoveEvidence and currentTimer ~= RemoveEvidence then
+                bulletholeList[#bulletholeList + 1] = CurrentBullethole
+                TriggerServerEvent('evidence:server:ClearBullethole', bulletholeList)
             end
         end
-        -----------------------------[ VEHICLE FRAGEMENTS ]-----------------------------
-        if Fragments and next(Fragments) then
-            for k, v in pairs(Fragments) do
-                CurrentVehicleFragment = k
-                local timer = GetGameTimer()
-                local currentTimer = Fragments[CurrentVehicleFragment].time + RemoveEvidence
-                if timer > Fragments[CurrentVehicleFragment].time + RemoveEvidence and currentTimer ~= RemoveEvidence then
-                    vehiclefragmentList[#vehiclefragmentList + 1] = CurrentVehicleFragment
-                    TriggerServerEvent('evidence:server:ClearVehicleFragments', vehiclefragmentList)
-                end
+    end
+    -----------------------------[ VEHICLE FRAGEMENTS ]-----------------------------
+    if Fragments and next(Fragments) then
+        for k, v in pairs(Fragments) do
+            CurrentVehicleFragment = k
+            local timer = GetGameTimer()
+            local currentTimer = Fragments[CurrentVehicleFragment].time + RemoveEvidence
+            if timer > Fragments[CurrentVehicleFragment].time + RemoveEvidence and currentTimer ~= RemoveEvidence then
+                vehiclefragmentList[#vehiclefragmentList + 1] = CurrentVehicleFragment
+                TriggerServerEvent('evidence:server:ClearVehicleFragments', vehiclefragmentList)
             end
         end
     end
 end)
 
 -----------------------------------------[ CHECK WITH FLASHLIGHT OR CAMERA ]-----------------------------------------
-CreateThread(function()
+local isLoopActive = false
 
-    local sleep = 5
-
-    while true do
+lib.onCache('weapon', function(value)
+    if not value then
+        isLoopActive = false
+        return
+    end
+    if value == joaat('WEAPON_FLASHLIGHT') then
         if LocalPlayer.state.isLoggedIn then
-            if PlayerJob.type == 'leo' and PlayerJob.onduty then
-                if IsPlayerFreeAiming(PlayerId()) and GetSelectedPedWeapon(PlayerPedId()) == `WEAPON_FLASHLIGHT` then
-                    ProcessMarkers(Blooddrops, "blood")
-                    ProcessMarkers(Fingerprints, "fingerprint")
-                    ProcessMarkers(Casings, "casing")
-                    ProcessMarkers(Bullethole, "bullet")
-                    ProcessMarkers(Fragments, "vehiclefragment")
+            if QBCore.Functions.GetPlayerData().job.type == 'leo' then
+                if not isLoopActive then
+                    isLoopActive = true  -- Enable the loop only if it's not already active
+                    CreateThread(function()
+                        while isLoopActive do
+                            local sleep = 5
+                            if IsPlayerFreeAiming(PlayerId()) then
+                                sleep = 5
+                                ProcessMarkers(Blooddrops, "blood")
+                                ProcessMarkers(Fingerprints, "fingerprint")
+                                ProcessMarkers(Casings, "casing")
+                                ProcessMarkers(Bullethole, "bullet")
+                                ProcessMarkers(Fragments, "vehiclefragment")
+                                Wait(sleep)
+                            else
+                                sleep = 500
+                                Wait(sleep)
+                            end
+                        end
+                    end)
                 end
             end
         end
-        Wait(sleep)
     end
 end)
 
