@@ -5,10 +5,10 @@ local Translations = {
         bullet_hole_not_removed = 'Kulehull fjernet ikke',
         vehicle_fragments_not_removed = 'Kjøretøyfragmenter ikke fjernet',
         scene_not_removed = 'Åsted ikke fjernet',
-        config_error = 'LSN-EVIDENCE: Something is wrong in the Config',
+        config_error = 'LSN-EVIDENCE: Noe er galt i din config',
         no_player = 'Ingen spiller i rekkevidde!',
         have_evidence_bag = 'Du må ha en tom bevispose med deg',
-        plate_nil = 'Plate is nil!',
+        plate_nil = 'Skilt nr er nil!',
             },
     success = {
         blood_clear = 'Blod ryddet',
