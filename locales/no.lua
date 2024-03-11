@@ -9,7 +9,7 @@ local Translations = {
         no_player = 'Ingen spiller i rekkevidde!',
         have_evidence_bag = 'Du må ha en tom bevispose med deg',
         plate_nil = 'Skilt nr er nil!',
-            },
+    },
     success = {
         blood_clear = 'Blod ryddet',
         bullet_casing_removed = 'Kulehylse fjernet...',
