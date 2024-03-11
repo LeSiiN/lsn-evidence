@@ -36,21 +36,6 @@ local WhitelistedWeapons = {
 }
 
 ------------------------------------------------------------------------------[ FUNCTIONS ]------------------------------------------------------------------------------
-local function DrawText3D(x, y, z, text)
-    SetTextScale(0.30, 0.30)
-    SetTextFont(4)
-    SetTextProportional(1)
-    SetTextColour(255, 255, 255, 215)
-    BeginTextCommandDisplayText('STRING')
-    SetTextCentre(true)
-    AddTextComponentSubstringPlayerName(text)
-    SetDrawOrigin(x, y, z, 0)
-    EndTextCommandDisplayText(0.0, 0.0)
-    local factor = (string.len(text)) / 370
-    DrawRect(0.0, 0.0 + 0.0125, 0.015 + factor, 0.03, 0, 0, 0, 68)
-    ClearDrawOrigin()
-end
-
 local function WhitelistedWeapon(weapon)
     for i = 1, #WhitelistedWeapons do
         if WhitelistedWeapons[i] == weapon then
@@ -116,16 +101,6 @@ local function RayCastGamePlayCamera(distance)
 	}
 	local result, hit, endCoords, _, entityHit = GetShapeTestResult(StartShapeTestRay(cameraCoord.x, cameraCoord.y, cameraCoord.z, destination.x, destination.y, destination.z, -1, PlayerPedId(), 0))
 	return hit == 1, endCoords, entityHit
-end
-
-local function DrawLineDisableNotify()
-    if Config.Notify == "qb" then
-        QBCore.Functions.Notify(Lang:t('error.drawLine_disabled'), 'error')
-    elseif Config.Notify == "ox" then
-        lib.notify({ title = 'Evidence', description = Lang:t('error.error.drawLine_disabled'), duration = 5000, type = 'error' })
-    else
-        print(Lang:t('error.config_error'))
-    end
 end
 
 local function WaitTimer(name, action, ...)
@@ -454,67 +429,39 @@ RegisterNetEvent('evidence:client:ClearVehicleFragmentsInArea', function()
 end)
 
 -----------------------------------------[ EVENTS FOR COMMANDS/ITEMS ]-----------------------------------------
-RegisterNetEvent('evidence:client:ClearScene', function()
+
+local function ClearScene(progressDuration)
     local pos = GetEntityCoords(PlayerPedId())
-    local bulletholeList = {}
-    local casingList = {}
-    local blooddropList = {}
-    local fingerprintList = {}
-    local vehiclefragmentList = {}
-    QBCore.Functions.Progressbar('clear_scene', Lang:t('progressbar.crime_scene'), 5000, false, true, {
+    local bulletholeList, casingList, blooddropList, fingerprintList, vehiclefragmentList = {}, {}, {}, {}, {}
+
+    QBCore.Functions.Progressbar('clear_scene', Lang:t('progressbar.crime_scene'), progressDuration, false, true, {
         disableMovement = false,
         disableCarMovement = false,
         disableMouse = false,
         disableCombat = true
-    }, {}, {}, {}, function() -- Done
-        if Bullethole and next(Bullethole) then
-            for bulletholeId, _ in pairs(Bullethole) do
-                if #(pos - vector3(Bullethole[bulletholeId].coords.x, Bullethole[bulletholeId].coords.y, Bullethole[bulletholeId].coords.z)) <
-                    30.0 then
-                        bulletholeList[#bulletholeList + 1] = bulletholeId
+    }, {
+        animDict = 'amb@medic@standing@tendtodead@idle_a',
+        anim = 'idle_a',
+        flags = 1,
+    }, {}, {}, function() -- Done
+        local function removeEvidence(evidenceTable, evidenceType, event, list)
+            if evidenceTable and next(evidenceTable) then
+                for evidenceId, _ in pairs(evidenceTable) do
+                    local evidenceCoords = vector3(evidenceTable[evidenceId].coords.x, evidenceTable[evidenceId].coords.y, evidenceTable[evidenceId].coords.z)
+                    if #(pos - evidenceCoords) < 30.0 then
+                        list[#list + 1] = evidenceId
+                    end
                 end
+                TriggerServerEvent('evidence:server:' .. event, list)
             end
-            TriggerServerEvent('evidence:server:ClearBullethole', bulletholeList)
         end
-        if Casings and next(Casings) then
-            for casingId, _ in pairs(Casings) do
-                if #(pos - vector3(Casings[casingId].coords.x, Casings[casingId].coords.y, Casings[casingId].coords.z)) <
-                    30.0 then
-                    casingList[#casingList + 1] = casingId
-                end
-            end
-            TriggerServerEvent('evidence:server:ClearCasings', casingList)
-        end
-        if Blooddrops and next(Blooddrops) then
-            for bloodId, _ in pairs(Blooddrops) do
-                if #(pos -
-                        vector3(Blooddrops[bloodId].coords.x, Blooddrops[bloodId].coords.y, Blooddrops[bloodId].coords.z)) <
-                        30.0 then
-                    blooddropList[#blooddropList + 1] = bloodId
-                end
-            end
-            TriggerServerEvent('evidence:server:ClearBlooddrops', blooddropList)
-        end
-        if Fingerprints and next(Fingerprints) then
-            for fingerId, _ in pairs(Fingerprints) do
-                if #(pos -
-                        vector3(Fingerprints[fingerId].coords.x, Fingerprints[fingerId].coords.y, Fingerprints[fingerId].coords.z)) <
-                        30.0 then
-                            fingerprintList[#fingerprintList + 1] = fingerId
-                end
-            end
-            TriggerServerEvent('evidence:server:ClearBlooddrops', fingerprintList)
-        end
-        if Fragments and next(Fragments) then
-            for vehiclefragmentId, _ in pairs(Fragments) do
-                if #(pos -
-                        vector3(Fragments[vehiclefragmentId].coords.x, Fragments[vehiclefragmentId].coords.y, Fragments[vehiclefragmentId].coords.z)) <
-                        30.0 then
-                            vehiclefragmentList[#vehiclefragmentList + 1] = vehiclefragmentId
-                end
-            end
-            TriggerServerEvent('evidence:server:ClearVehicleFragments', vehiclefragmentList)
-        end
+
+        removeEvidence(Bullethole, "bullethole", 'ClearBullethole', bulletholeList)
+        removeEvidence(Casings, "casing", 'ClearCasings', casingList)
+        removeEvidence(Blooddrops, "blood", 'ClearBlooddrops', blooddropList)
+        removeEvidence(Fingerprints, "fingerprint", 'ClearFingerprints', fingerprintList)
+        removeEvidence(Fragments, "vehiclefragment", 'ClearVehicleFragments', vehiclefragmentList)
+
         if Config.Notify == "qb" then
             QBCore.Functions.Notify(Lang:t('success.crime_scene_removed'), 'success')
         elseif Config.Notify == "ox" then
@@ -531,87 +478,15 @@ RegisterNetEvent('evidence:client:ClearScene', function()
             print(Lang:t('error.config_error'))
         end
     end)
+end
+
+RegisterNetEvent('evidence:client:ClearScene', function() 
+    ClearScene(5000)
 end)
 
-RegisterNetEvent('evidence:client:ClearSceneCrime', function()
-    local pos = GetEntityCoords(PlayerPedId())
-    local bulletholeList = {}
-    local casingList = {}
-    local blooddropList = {}
-    local fingerprintList = {}
-    local vehiclefragmentList = {}
-    QBCore.Functions.Progressbar('clear_scene', Lang:t('progressbar.crime_scene'), 3000, false, true, {
-        disableMovement = false,
-        disableCarMovement = false,
-        disableMouse = false,
-        disableCombat = true
-    }, {}, {}, {}, function() -- Done
-        if Bullethole and next(Bullethole) then
-            for bulletholeId, _ in pairs(Bullethole) do
-                if #(pos - vector3(Bullethole[bulletholeId].coords.x, Bullethole[bulletholeId].coords.y, Bullethole[bulletholeId].coords.z)) <
-                    30.0 then
-                        bulletholeList[#bulletholeList + 1] = bulletholeId
-                end
-            end
-            TriggerServerEvent('evidence:server:ClearBullethole', bulletholeList)
-        end
-        if Casings and next(Casings) then
-            for casingId, _ in pairs(Casings) do
-                if #(pos - vector3(Casings[casingId].coords.x, Casings[casingId].coords.y, Casings[casingId].coords.z)) <
-                    30.0 then
-                    casingList[#casingList + 1] = casingId
-                end
-            end
-            TriggerServerEvent('evidence:server:ClearCasings', casingList)
-        end
-        if Blooddrops and next(Blooddrops) then
-            for bloodId, _ in pairs(Blooddrops) do
-                if #(pos -
-                        vector3(Blooddrops[bloodId].coords.x, Blooddrops[bloodId].coords.y, Blooddrops[bloodId].coords.z)) <
-                        30.0 then
-                    blooddropList[#blooddropList + 1] = bloodId
-                end
-            end
-            TriggerServerEvent('evidence:server:ClearBlooddrops', blooddropList)
-        end
-        if Fingerprints and next(Fingerprints) then
-            for fingerId, _ in pairs(Fingerprints) do
-                if #(pos -
-                        vector3(Fingerprints[fingerId].coords.x, Fingerprints[fingerId].coords.y, Fingerprints[fingerId].coords.z)) <
-                        30.0 then
-                            fingerprintList[#fingerprintList + 1] = fingerId
-                end
-            end
-            TriggerServerEvent('evidence:server:ClearBlooddrops', fingerprintList)
-        end
-        if Fragments and next(Fragments) then
-            for vehiclefragmentId, _ in pairs(Fragments) do
-                if #(pos -
-                        vector3(Fragments[vehiclefragmentId].coords.x, Fragments[vehiclefragmentId].coords.y, Fragments[vehiclefragmentId].coords.z)) <
-                        30.0 then
-                            vehiclefragmentList[#vehiclefragmentList + 1] = vehiclefragmentId
-                end
-            end
-            TriggerServerEvent('evidence:server:ClearVehicleFragments', vehiclefragmentList)
-        end
-        if Config.Notify == "qb" then
-            QBCore.Functions.Notify(Lang:t('success.crime_scene_removed'), 'success')
-        elseif Config.Notify == "ox" then
-            lib.notify({ title = 'Evidence', description = Lang:t('success.crime_scene_removed'), duration = 5000, type = 'success' })
-        else
-            print(Lang:t('error.config_error'))
-        end
-    end, function() -- Cancel
-        if Config.Notify == "qb" then
-            QBCore.Functions.Notify(Lang:t('error.scene_not_removed'), 'error')
-        elseif Config.Notify == "ox" then
-            lib.notify({ title = 'Evidence', description = Lang:t('error.scene_not_removed'), duration = 5000, type = 'error' })
-        else
-            print(Lang:t('error.config_error'))
-        end
-    end)
+RegisterNetEvent('evidence:client:ClearSceneCrime', function() 
+    ClearScene(30000)
 end)
-
 ------------------------------------------------------------------------------[ WAS THREADS AT SOME POINT ]------------------------------------------------------------------------------
 
 -----------------------------------------[ DROP EVIDENCE ]-----------------------------------------
@@ -639,72 +514,33 @@ end)
 
 -----------------------------------------[ REMOVE EVIDENCE ]-----------------------------------------
 RegisterNetEvent('evidence:client:deleteEvidence', function()
-    local bulletholeList = {}
-    local casingList = {}
-    local blooddropList = {}
-    local fingerprintList = {}
-    local vehiclefragmentList = {}
     local RemoveEvidence = Config.RemoveEvidence * 60 * 1000
-    -----------------------------[ CASINGS ]-----------------------------
-    if Casings and next(Casings) then
-        for k, v in pairs(Casings) do
-            CurrentCasing = k
-            local timer = GetGameTimer()
-            local currentTimer = Casings[CurrentCasing].time + RemoveEvidence
-            if timer > Casings[CurrentCasing].time + RemoveEvidence and currentTimer ~= RemoveEvidence then
-                casingList[#casingList + 1] = CurrentCasing
-                TriggerServerEvent('evidence:server:ClearCasings', casingList)
+    local function cleanupEvidence(evidenceType, evidenceList, clearEvent)
+        if evidenceList and next(evidenceList) then
+            local evidenceToRemove = {}
+            for k, v in pairs(evidenceList) do
+                local currentEvidence = k
+                local timer = GetGameTimer()
+                local currentTimer = v.time + RemoveEvidence
+                if timer > v.time + RemoveEvidence and currentTimer ~= RemoveEvidence then
+                    evidenceToRemove[#evidenceToRemove + 1] = currentEvidence
+                end
+            end
+            if #evidenceToRemove > 0 then
+                TriggerServerEvent(clearEvent, evidenceToRemove)
             end
         end
     end
-    -----------------------------[ BLOOD ]-----------------------------
-    if Blooddrops and next(Blooddrops) then
-        for k, v in pairs(Blooddrops) do
-            CurrentBlooddrop = k
-            local timer = GetGameTimer()
-            local currentTimer = Blooddrops[CurrentBlooddrop].time + RemoveEvidence
-            if timer > Blooddrops[CurrentBlooddrop].time + RemoveEvidence and currentTimer ~= RemoveEvidence then
-                blooddropList[#blooddropList + 1] = CurrentBlooddrop
-                TriggerServerEvent('evidence:server:ClearBlooddrops', blooddropList)
-            end
-        end
-    end
-    -----------------------------[ FINGERPRINTS ]-----------------------------
-    if Fingerprints and next(Fingerprints) then
-        for k, v in pairs(Fingerprints) do
-            CurrentFingerprint = k
-            local timer = GetGameTimer()
-            local currentTimer = Fingerprints[CurrentFingerprint].time + RemoveEvidence
-            if timer > Fingerprints[CurrentFingerprint].time + RemoveEvidence and currentTimer ~= RemoveEvidence then
-                fingerprintList[#fingerprintList + 1] = CurrentFingerprint
-                TriggerServerEvent('evidence:server:ClearFingerprints', fingerprintList)
-            end
-        end
-    end
-    -----------------------------[ BULLETHOLE ]-----------------------------
-    if Bullethole and next(Bullethole) then
-        for k, v in pairs(Bullethole) do
-            CurrentBullethole = k
-            local timer = GetGameTimer()
-            local currentTimer = Bullethole[CurrentBullethole].time + RemoveEvidence
-            if timer > Bullethole[CurrentBullethole].time + RemoveEvidence and currentTimer ~= RemoveEvidence then
-                bulletholeList[#bulletholeList + 1] = CurrentBullethole
-                TriggerServerEvent('evidence:server:ClearBullethole', bulletholeList)
-            end
-        end
-    end
-    -----------------------------[ VEHICLE FRAGEMENTS ]-----------------------------
-    if Fragments and next(Fragments) then
-        for k, v in pairs(Fragments) do
-            CurrentVehicleFragment = k
-            local timer = GetGameTimer()
-            local currentTimer = Fragments[CurrentVehicleFragment].time + RemoveEvidence
-            if timer > Fragments[CurrentVehicleFragment].time + RemoveEvidence and currentTimer ~= RemoveEvidence then
-                vehiclefragmentList[#vehiclefragmentList + 1] = CurrentVehicleFragment
-                TriggerServerEvent('evidence:server:ClearVehicleFragments', vehiclefragmentList)
-            end
-        end
-    end
+    
+    cleanupEvidence("Casings", Casings, 'evidence:server:ClearCasings')
+    
+    cleanupEvidence("Blooddrops", Blooddrops, 'evidence:server:ClearBlooddrops')
+    
+    cleanupEvidence("Fingerprints", Fingerprints, 'evidence:server:ClearFingerprints')
+    
+    cleanupEvidence("Bullethole", Bullethole, 'evidence:server:ClearBullethole')
+    
+    cleanupEvidence("Fragments", Fragments, 'evidence:server:ClearVehicleFragments')
 end)
 
 -----------------------------------------[ CHECK WITH FLASHLIGHT OR CAMERA ]-----------------------------------------
@@ -743,58 +579,31 @@ lib.onCache('weapon', function(value)
     end
 end)
 
-function ProcessMarkers(markers, type)
-    local pos = GetEntityCoords(PlayerPedId(), true)
-    for k, v in pairs(markers) do
-        local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
-        if dist > 1.6 and dist < 20 then
-            DrawMarkerIfInRange(v, dist, type)
-        elseif dist < 1.6 then
-            CheckInteraction(v, dist, type, k)
-        end
-    end
-end
-
 function DrawMarkerIfInRange(v, dist, type)
     if dist > 1.5 and dist < 20 then
         SetDrawOrigin(v.coords.x, v.coords.y, v.coords.z, 0)
-        if type == "blood" then
-            while not HasStreamedTextureDictLoaded("blooddrops") do
-                Wait(10)
-                RequestStreamedTextureDict("blooddrops", true)
-            end
+        local textureDict = {
+            blood = "blooddrops",
+            fingerprint = "fingerprints",
+            casing = "casings",
+            bullet = "bullethole"
+        }
 
-            DrawSprite("blooddrops", "blooddrops", 0, 0, 0.02, 0.035, 0, 255, 255, 255, 255)
-        elseif type == "fingerprint" then
-            while not HasStreamedTextureDictLoaded("fingerprints") do
+        if textureDict[type] then
+            while not HasStreamedTextureDictLoaded(textureDict[type]) do
                 Wait(10)
-                RequestStreamedTextureDict("fingerprints", true)
+                RequestStreamedTextureDict(textureDict[type], true)
             end
-
-            DrawSprite("fingerprints", "fingerprints", 0, 0, 0.02, 0.035, 0, 255, 255, 255, 255)
-        elseif type == "casing" then
-            while not HasStreamedTextureDictLoaded("casings") do
-                Wait(10)
-                RequestStreamedTextureDict("casings", true)
-            end
-
-            DrawSprite("casings", "casings", 0, 0, 0.02, 0.035, 0, 255, 255, 255, 255)
-        elseif type == "bullet" then
-            while not HasStreamedTextureDictLoaded("bullethole") do
-                Wait(10)
-                RequestStreamedTextureDict("bullethole", true)
-            end
-            DrawSprite("bullethole", "bullethole", 0, 0, 0.02, 0.035, 0, 255, 255, 255, 255)
-            if Config.ShowShootersLine then
+            DrawSprite(textureDict[type], textureDict[type], 0, 0, 0.02, 0.035, 0, 255, 255, 255, 255)
+            if type == "bullet" or type == "vehiclefragment" and Config.ShowShootersLine then
                 DrawLine(v.coords.x, v.coords.y, v.coords.z, v.pedcoord.x, v.pedcoord.y, v.pedcoord.z, 255, 0, 0, 255)
             end
         elseif type == "vehiclefragment" then
-            DrawMarker(36, v.coords.x, v.coords.y, v.coords.z -0.05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.3, 0.2, v.r, v.g, v.b, 220, false, true, 2, nil, nil, false)
+            DrawMarker(36, v.coords.x, v.coords.y, v.coords.z - 0.05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.3, 0.2, v.r, v.g, v.b, 220, false, true, 2, nil, nil, false)
             if Config.ShowShootersLine then
                 DrawLine(v.coords.x, v.coords.y, v.coords.z, v.pedcoord.x, v.pedcoord.y, v.pedcoord.z, 255, 0, 0, 255)
             end
         end
-        ClearDrawOrigin()
     end
 end
 
@@ -910,6 +719,18 @@ elseif Config.PoliceJob == "qb" then
                     TriggerServerEvent('evidence:server:AddFragmentToInventory', key, info)
                 end
             end
+        end
+    end
+end
+
+function ProcessMarkers(markers, type)
+    local pos = GetEntityCoords(PlayerPedId(), true)
+    for k, v in pairs(markers) do
+        local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
+        if dist > 1.6 and dist < 20 then
+            DrawMarkerIfInRange(v, dist, type)
+        elseif dist < 1.6 then
+            CheckInteraction(v, dist, type, k)
         end
     end
 end
