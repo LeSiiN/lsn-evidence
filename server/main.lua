@@ -8,68 +8,23 @@ local QBCore = exports['qb-core']:GetCoreObject()
 local fingerprintsList = {}
 
 ------------------------------------------------------------------------------[ FUNCTIONS ]------------------------------------------------------------------------------
-local function CreateBloodId()
-    if BloodDrops then
-        local bloodId = math.random(10000, 99999)
-        while BloodDrops[bloodId] do
-            bloodId = math.random(10000, 99999)
-        end
-        return bloodId
-    else
-        local bloodId = math.random(10000, 99999)
-        return bloodId
-    end
-end
+local function CreateEvidenceId(type)
+    local evidenceTable = {
+        blood = BloodDrops,
+        finger = FingerDrops,
+        casing = Casings,
+        bullethole = Bullethole,
+        vehiclefragment = Fragments
+    }
 
-local function CreateFingerId()
-    if FingerDrops then
-        local fingerId = math.random(10000, 99999)
-        while FingerDrops[fingerId] do
-            fingerId = math.random(10000, 99999)
+    if evidenceTable[type] then
+        local evidenceId = math.random(10000, 99999)
+        while evidenceTable[type][evidenceId] do
+            evidenceId = math.random(10000, 99999)
         end
-        return fingerId
+        return evidenceId
     else
-        local fingerId = math.random(10000, 99999)
-        return fingerId
-    end
-end
-
-local function CreateCasingId()
-    if Casings then
-        local caseId = math.random(10000, 99999)
-        while Casings[caseId] do
-            caseId = math.random(10000, 99999)
-        end
-        return caseId
-    else
-        local caseId = math.random(10000, 99999)
-        return caseId
-    end
-end
-
-local function CreateBulletholeId()
-    if Bullethole then
-        local holesId = math.random(10000, 99999)
-        while Bullethole[holesId] do
-            holesId = math.random(10000, 99999)
-        end
-        return holesId
-    else
-        local holesId = math.random(10000, 99999)
-        return holesId
-    end
-end
-
-local function CreateVehicleFragmentId()
-    if VehicleFragment then
-        local fragmentId = math.random(10000, 99999)
-        while VehicleFragment[fragmentId] do
-            fragmentId = math.random(10000, 99999)
-        end
-        return fragmentId
-    else
-        local fragmentId = math.random(10000, 99999)
-        return fragmentId
+        return math.random(10000, 99999)
     end
 end
 
@@ -234,7 +189,7 @@ end)
 
 -----------------------------------------[ BLOOD ]-----------------------------------------
 RegisterNetEvent('evidence:server:CreateBloodDrop', function(citizenid, bloodtype, coords)
-    local bloodId = CreateBloodId()
+    local bloodId = CreateEvidenceId("blood")
     BloodDrops[bloodId] = {
         dna = citizenid,
         bloodtype = bloodtype
@@ -293,7 +248,7 @@ end)
 RegisterNetEvent('evidence:server:CreateFingerDrop', function(coords)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
-    local fingerId = CreateFingerId()
+    local fingerId = CreateEvidenceId("finger")
     FingerDrops[fingerId] = Player.PlayerData.metadata['fingerprint']
     TriggerClientEvent('evidence:client:AddFingerPrint', -1, fingerId, Player.PlayerData.metadata['fingerprint'], coords)
 end)
@@ -346,7 +301,7 @@ end)
 RegisterNetEvent('evidence:server:CreateCasing', function(weapon, coords, currentTime)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
-    local casingId = CreateCasingId()
+    local casingId = CreateEvidenceId("casing")
     local weaponInfo = QBCore.Shared.Weapons[weapon]
     local serieNumber = nil
     if Config.Inventory == "ox" then
@@ -420,7 +375,7 @@ end)
 RegisterNetEvent('evidence:server:CreateBullethole', function(weapon, raycastcoords, pedcoords, heading, currentTime)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
-    local bulletholeId = CreateBulletholeId()
+    local bulletholeId = CreateEvidenceId("bullethole")
     local weaponInfo = QBCore.Shared.Weapons[weapon]
     local serieNumber = nil
     if Config.Inventory == "ox" then
@@ -494,7 +449,7 @@ end)
 RegisterNetEvent('evidence:server:CreateVehicleFragment', function(weapon, raycastcoords, pedcoords, heading, currentTime, entityHit, r, g, b)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
-    local vehiclefragmentId = CreateVehicleFragmentId()
+    local fragmentId = CreateEvidenceId("vehiclefragment")
     local weaponInfo = QBCore.Shared.Weapons[weapon]
     local serieNumber = nil
     if Config.Inventory == "ox" then
@@ -566,6 +521,6 @@ RegisterNetEvent('evidence:server:AddFragmentToInventory', function(vehiclefragm
 end)
 
 -----------------------------------------[ deleteEvidence Logic ]-----------------------------------------
-lib.cron.new('*/1 * * * *', function()
+lib.cron.new('*/' ..Config.RemoveEvidence.. ' * * * *', function()
     TriggerClientEvent("evidence:client:deleteEvidence", -1)
 end)
