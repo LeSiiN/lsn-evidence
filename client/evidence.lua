@@ -696,7 +696,7 @@ function ProcessMarkers(markers, type)
     local pos = GetEntityCoords(PlayerPedId(), true)
     for k, v in pairs(markers) do
         local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
-        if dist > 1.6 and dist < 20 then
+        if dist > 1.1 and dist < 20 then
             DrawMarkerIfInRange(v, dist, type)
         elseif dist < 1.1 then
             CheckInteraction(v, dist, type, k)
