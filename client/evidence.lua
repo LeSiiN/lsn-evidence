@@ -548,145 +548,139 @@ lib.onCache('weapon', function(value)
     end
 end)
 
-function DrawMarkerIfInRange(v, dist, type)
-    if dist > 1.5 and dist < 20 then
-        SetDrawOrigin(v.coords.x, v.coords.y, v.coords.z, 0)
-        local textureDict = {
-            blood = "blooddrops",
-            fingerprint = "fingerprints",
-            casing = "casings",
-            bullet = "bullethole"
-        }
+function DrawMarkerIfInRange(v, type)
+    SetDrawOrigin(v.coords.x, v.coords.y, v.coords.z, 0)
+    local textureDict = {
+        blood = "blooddrops",
+        fingerprint = "fingerprints",
+        casing = "casings",
+        bullet = "bullethole"
+    }
 
-        if textureDict[type] then
-            while not HasStreamedTextureDictLoaded(textureDict[type]) do
-                Wait(10)
-                RequestStreamedTextureDict(textureDict[type], true)
-            end
-            DrawSprite(textureDict[type], textureDict[type], 0, 0, 0.02, 0.035, 0, 255, 255, 255, 255)
-            if type == "bullet" or type == "vehiclefragment" and Config.ShowShootersLine then
-                DrawLine(v.coords.x, v.coords.y, v.coords.z, v.pedcoord.x, v.pedcoord.y, v.pedcoord.z, 255, 0, 0, 255)
-            end
-        elseif type == "vehiclefragment" then
-            DrawMarker(36, v.coords.x, v.coords.y, v.coords.z - 0.05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.3, 0.2, v.r, v.g, v.b, 220, false, true, 2, nil, nil, false)
-            if Config.ShowShootersLine then
-                DrawLine(v.coords.x, v.coords.y, v.coords.z, v.pedcoord.x, v.pedcoord.y, v.pedcoord.z, 255, 0, 0, 255)
-            end
+    if textureDict[type] then
+        while not HasStreamedTextureDictLoaded(textureDict[type]) do
+            Wait(10)
+            RequestStreamedTextureDict(textureDict[type], true)
+        end
+        DrawSprite(textureDict[type], textureDict[type], 0, 0, 0.02, 0.035, 0, 255, 255, 255, 255)
+        if type == "bullet" or type == "vehiclefragment" and Config.ShowShootersLine then
+            DrawLine(v.coords.x, v.coords.y, v.coords.z, v.pedcoord.x, v.pedcoord.y, v.pedcoord.z, 255, 0, 0, 255)
+        end
+    elseif type == "vehiclefragment" then
+        DrawMarker(36, v.coords.x, v.coords.y, v.coords.z - 0.05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.3, 0.2, v.r, v.g, v.b, 220, false, true, 2, nil, nil, false)
+        if Config.ShowShootersLine then
+            DrawLine(v.coords.x, v.coords.y, v.coords.z, v.pedcoord.x, v.pedcoord.y, v.pedcoord.z, 255, 0, 0, 255)
         end
     end
 end
 
 if Config.PoliceJob == "hi-dev" then
-    function CheckInteraction(marker, dist, type, key)
+    function CheckInteraction(marker, type, key)
         local pos = GetEntityCoords(PlayerPedId(), true)
         local coords = vector3(marker.coords.x, marker.coords.y, marker.coords.z)
-        if dist < 1.5 then
-            SetDrawOrigin(coords, 0)
-            while not HasStreamedTextureDictLoaded("interact") do
-                Wait(10)
-                RequestStreamedTextureDict("interact", true)
+        SetDrawOrigin(coords, 0)
+        while not HasStreamedTextureDictLoaded("interact") do
+            Wait(10)
+            RequestStreamedTextureDict("interact", true)
+        end
+
+        DrawSprite("interact", "interact", 0, 0, 0.02, 0.035, 0, 255, 255, 255, 255)
+        ClearDrawOrigin()
+        if IsControlJustReleased(0, 38) then
+            local s1, s2 = GetStreetNameAtCoord(coords.x, coords.y, coords.z)
+            local street1 = GetStreetNameFromHashKey(s1)
+            local street2 = GetStreetNameFromHashKey(s2)
+            local streetLabel = street1
+            if street2 then
+                streetLabel = streetLabel .. ' | ' .. street2
             end
-    
-            DrawSprite("interact", "interact", 0, 0, 0.02, 0.035, 0, 255, 255, 255, 255)
-            ClearDrawOrigin()
-            if IsControlJustReleased(0, 38) then
-                local s1, s2 = GetStreetNameAtCoord(coords.x, coords.y, coords.z)
-                local street1 = GetStreetNameFromHashKey(s1)
-                local street2 = GetStreetNameFromHashKey(s2)
-                local streetLabel = street1
-                if street2 then
-                    streetLabel = streetLabel .. ' | ' .. street2
-                end
-                local info = {
-                    label = Lang:t('info.' .. type),
-                    type = type,
-                    street = streetLabel:gsub("%'", ''),
-                }
-                if type == "blood" then
-                    info.dnalabel = Lang:t('info.unknown')
-                    info.dnalabel2 = DnaHash(marker.citizenid)
-                    info.bloodtype = Lang:t('info.unknown')
-                    info.bloodtype2 = marker.bloodtype
-                    TriggerServerEvent('evidence:server:AddBlooddropToInventory', key, info)
-                elseif type == "fingerprint" then
-                    info.fingerprint = Lang:t('info.unknown')
-                    info.fingerprint2 = marker.fingerprint
-                    TriggerServerEvent('evidence:server:AddFingerprintToInventory', key, info)
-                elseif type == "casing" then
-                    info.ammolabel = Config.AmmoLabels[QBCore.Shared.Weapons[Casings[key].type]['ammotype']]
-                    info.ammotype = Lang:t('info.unknown')
-                    info.ammotype2 = Casings[key].type
-                    info.serie = Lang:t('info.unknown')
-                    info.serie2 = Casings[key].serie
-                    TriggerServerEvent('evidence:server:AddCasingToInventory', key, info)
-                elseif type == "bullet" then
-                    info.ammolabel = Config.AmmoLabels[QBCore.Shared.Weapons[Bullethole[key].type]['ammotype']]
-                    info.ammotype = Lang:t('info.unknown')
-                    info.ammotype2 = Bullethole[key].type
-                    info.serie = Lang:t('info.unknown')
-                    info.serie2 = Bullethole[key].serie
-                    TriggerServerEvent('evidence:server:AddBulletToInventory', key, info)
-                elseif type == "vehiclefragment" then
-                    info.rgb = Lang:t('info.unknown')
-                    info.rgb2 = "R: " ..marker.r.. " / G: " ..marker.g.. " / B: " ..marker.b
-                    info.ammotype = Lang:t('info.unknown')
-                    info.ammotype2 = Fragments[key].type
-                    info.serie = Lang:t('info.unknown')
-                    info.serie2 = Fragments[key].serie
-                    TriggerServerEvent('evidence:server:AddFragmentToInventory', key, info)
-                end
+            local info = {
+                label = Lang:t('info.' .. type),
+                type = type,
+                street = streetLabel:gsub("%'", ''),
+            }
+            if type == "blood" then
+                info.dnalabel = Lang:t('info.unknown')
+                info.dnalabel2 = DnaHash(marker.citizenid)
+                info.bloodtype = Lang:t('info.unknown')
+                info.bloodtype2 = marker.bloodtype
+                TriggerServerEvent('evidence:server:AddBlooddropToInventory', key, info)
+            elseif type == "fingerprint" then
+                info.fingerprint = Lang:t('info.unknown')
+                info.fingerprint2 = marker.fingerprint
+                TriggerServerEvent('evidence:server:AddFingerprintToInventory', key, info)
+            elseif type == "casing" then
+                info.ammolabel = Config.AmmoLabels[QBCore.Shared.Weapons[Casings[key].type]['ammotype']]
+                info.ammotype = Lang:t('info.unknown')
+                info.ammotype2 = Casings[key].type
+                info.serie = Lang:t('info.unknown')
+                info.serie2 = Casings[key].serie
+                TriggerServerEvent('evidence:server:AddCasingToInventory', key, info)
+            elseif type == "bullet" then
+                info.ammolabel = Config.AmmoLabels[QBCore.Shared.Weapons[Bullethole[key].type]['ammotype']]
+                info.ammotype = Lang:t('info.unknown')
+                info.ammotype2 = Bullethole[key].type
+                info.serie = Lang:t('info.unknown')
+                info.serie2 = Bullethole[key].serie
+                TriggerServerEvent('evidence:server:AddBulletToInventory', key, info)
+            elseif type == "vehiclefragment" then
+                info.rgb = Lang:t('info.unknown')
+                info.rgb2 = "R: " ..marker.r.. " / G: " ..marker.g.. " / B: " ..marker.b
+                info.ammotype = Lang:t('info.unknown')
+                info.ammotype2 = Fragments[key].type
+                info.serie = Lang:t('info.unknown')
+                info.serie2 = Fragments[key].serie
+                TriggerServerEvent('evidence:server:AddFragmentToInventory', key, info)
             end
         end
     end
 elseif Config.PoliceJob == "qb" then
-    function CheckInteraction(marker, dist, type, key)
+    function CheckInteraction(marker, type, key)
         local pos = GetEntityCoords(PlayerPedId(), true)
         local coords = vector3(marker.coords.x, marker.coords.y, marker.coords.z)
-        if dist < 1 then
-            SetDrawOrigin(coords, 0)
-            while not HasStreamedTextureDictLoaded("interact") do
-                Wait(10)
-                RequestStreamedTextureDict("interact", true)
+        SetDrawOrigin(coords, 0)
+        while not HasStreamedTextureDictLoaded("interact") do
+            Wait(10)
+            RequestStreamedTextureDict("interact", true)
+        end
+
+        DrawSprite("interact", "interact", 0, 0, 0.02, 0.035, 0, 255, 255, 255, 255)
+        ClearDrawOrigin()
+        if IsControlJustReleased(0, 38) then
+            local s1, s2 = GetStreetNameAtCoord(coords.x, coords.y, coords.z)
+            local street1 = GetStreetNameFromHashKey(s1)
+            local street2 = GetStreetNameFromHashKey(s2)
+            local streetLabel = street1
+            if street2 then
+                streetLabel = streetLabel .. ' | ' .. street2
             end
-    
-            DrawSprite("interact", "interact", 0, 0, 0.02, 0.035, 0, 255, 255, 255, 255)
-            ClearDrawOrigin()
-            if IsControlJustReleased(0, 38) then
-                local s1, s2 = GetStreetNameAtCoord(coords.x, coords.y, coords.z)
-                local street1 = GetStreetNameFromHashKey(s1)
-                local street2 = GetStreetNameFromHashKey(s2)
-                local streetLabel = street1
-                if street2 then
-                    streetLabel = streetLabel .. ' | ' .. street2
-                end
-                local info = {
-                    label = Lang:t('info.' .. type),
-                    type = type,
-                    street = streetLabel:gsub("%'", ''),
-                }
-                if type == "blood" then
-                    info.dnalabel = DnaHash(marker.citizenid)
-                    info.bloodtype = marker.bloodtype
-                    TriggerServerEvent('evidence:server:AddBlooddropToInventory', key, info)
-                elseif type == "fingerprint" then
-                    info.fingerprint = marker.fingerprint
-                    TriggerServerEvent('evidence:server:AddFingerprintToInventory', key, info)
-                elseif type == "casing" then
-                    info.ammolabel = Config.AmmoLabels[QBCore.Shared.Weapons[Casings[key].type]['ammotype']]
-                    info.ammotype = Casings[key].type
-                    info.serie = Casings[key].serie
-                    TriggerServerEvent('evidence:server:AddCasingToInventory', key, info)
-                elseif type == "bullet" then
-                    info.ammolabel = Config.AmmoLabels[QBCore.Shared.Weapons[Bullethole[key].type]['ammotype']]
-                    info.ammotype = Bullethole[key].type
-                    info.serie = Bullethole[key].serie
-                    TriggerServerEvent('evidence:server:AddBulletToInventory', key, info)
-                elseif type == "vehiclefragment" then
-                    info.rgb = "R: " ..marker.r.. " / G: " ..marker.g.. " / B: " ..marker.b
-                    info.ammotype = Fragments[key].type
-                    info.serie = Fragments[key].serie
-                    TriggerServerEvent('evidence:server:AddFragmentToInventory', key, info)
-                end
+            local info = {
+                label = Lang:t('info.' .. type),
+                type = type,
+                street = streetLabel:gsub("%'", ''),
+            }
+            if type == "blood" then
+                info.dnalabel = DnaHash(marker.citizenid)
+                info.bloodtype = marker.bloodtype
+                TriggerServerEvent('evidence:server:AddBlooddropToInventory', key, info)
+            elseif type == "fingerprint" then
+                info.fingerprint = marker.fingerprint
+                TriggerServerEvent('evidence:server:AddFingerprintToInventory', key, info)
+            elseif type == "casing" then
+                info.ammolabel = Config.AmmoLabels[QBCore.Shared.Weapons[Casings[key].type]['ammotype']]
+                info.ammotype = Casings[key].type
+                info.serie = Casings[key].serie
+                TriggerServerEvent('evidence:server:AddCasingToInventory', key, info)
+            elseif type == "bullet" then
+                info.ammolabel = Config.AmmoLabels[QBCore.Shared.Weapons[Bullethole[key].type]['ammotype']]
+                info.ammotype = Bullethole[key].type
+                info.serie = Bullethole[key].serie
+                TriggerServerEvent('evidence:server:AddBulletToInventory', key, info)
+            elseif type == "vehiclefragment" then
+                info.rgb = "R: " ..marker.r.. " / G: " ..marker.g.. " / B: " ..marker.b
+                info.ammotype = Fragments[key].type
+                info.serie = Fragments[key].serie
+                TriggerServerEvent('evidence:server:AddFragmentToInventory', key, info)
             end
         end
     end
@@ -697,9 +691,9 @@ function ProcessMarkers(markers, type)
     for k, v in pairs(markers) do
         local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
         if dist > 1.1 and dist < 20 then
-            DrawMarkerIfInRange(v, dist, type)
-        elseif dist < 1.1 then
-            CheckInteraction(v, dist, type, k)
+            DrawMarkerIfInRange(v, type)
+        elseif dist < 1 then
+            CheckInteraction(v, type, k)
         end
     end
 end
