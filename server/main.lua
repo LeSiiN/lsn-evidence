@@ -469,7 +469,7 @@ RegisterNetEvent('evidence:server:CreateVehicleFragment', function(weapon, rayca
             end
         end
     end
-    TriggerClientEvent('evidence:client:AddVehicleFragment', -1, vehiclefragmentId, weapon, raycastcoords, pedcoords, heading, currentTime, entityHit, r, g, b, serieNumber)
+    TriggerClientEvent('evidence:client:AddVehicleFragment', -1, fragmentId, weapon, raycastcoords, pedcoords, heading, currentTime, entityHit, r, g, b, serieNumber)
 end)
 
 RegisterNetEvent('evidence:server:ClearVehicleFragments', function(vehiclefragmentList)
