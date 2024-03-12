@@ -72,37 +72,6 @@ local function DnaHash(s)
     return h
 end
 
-local function RotationToDirection(rotation)
-	local adjustedRotation =
-	{
-		x = (math.pi / 180) * rotation.x,
-		y = (math.pi / 180) * rotation.y,
-		z = (math.pi / 180) * rotation.z
-	}
-	local direction =
-	{
-		x = -math.sin(adjustedRotation.z) * math.abs(math.cos(adjustedRotation.x)),
-		y = math.cos(adjustedRotation.z) * math.abs(math.cos(adjustedRotation.x)),
-		z = math.sin(adjustedRotation.x)
-	}
-	return direction
-end
-
-local function RayCastGamePlayCamera(distance)
-    local playerPed = PlayerPedId()
-    local cameraRotation = GetGameplayCamRot()
-	local cameraCoord = GetGameplayCamCoord()
-	local direction = RotationToDirection(cameraRotation)
-	local destination =
-	{
-		x = cameraCoord.x + direction.x * distance,
-		y = cameraCoord.y + direction.y * distance,
-		z = cameraCoord.z + direction.z * distance
-	}
-	local result, hit, endCoords, _, entityHit = GetShapeTestResult(StartShapeTestRay(cameraCoord.x, cameraCoord.y, cameraCoord.z, destination.x, destination.y, destination.z, -1, PlayerPedId(), 0))
-	return hit == 1, endCoords, entityHit
-end
-
 local function WaitTimer(name, action, ...)
     if not Config.TimerName[name] then return end
 
@@ -499,7 +468,7 @@ AddEventHandler('CEventGunShot', function(witnesses, ped)
             local pedcoords = GetEntityCoords(ped)
             local heading = GetEntityHeading(ped)
 
-            local hit, raycastcoords, entityHit = RayCastGamePlayCamera(1000.0)
+            local hit, entityHit, raycastcoords = lib.raycast.cam(511, 4, 1000)
             local weapon = GetSelectedPedWeapon(ped)
             if not WhitelistedWeapon(weapon) then
                 currentTime = GetGameTimer()
@@ -673,7 +642,7 @@ elseif Config.PoliceJob == "qb" then
     function CheckInteraction(marker, dist, type, key)
         local pos = GetEntityCoords(PlayerPedId(), true)
         local coords = vector3(marker.coords.x, marker.coords.y, marker.coords.z)
-        if dist < 1.5 then
+        if dist < 1 then
             SetDrawOrigin(coords, 0)
             while not HasStreamedTextureDictLoaded("interact") do
                 Wait(10)
