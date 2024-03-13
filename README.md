@@ -2,7 +2,8 @@
     This Script was made from the evidence Code from qb-policejob! Please follow the Installation!
 
 # To-Do
-    When near two Evidence Markers, only allow the player to pick up a single one (and display the 'E' interact prompt for only one Evidence Marker).
+- When near two Evidence Markers, only allow the player to pick up a single one (and display the 'E' interact prompt for only one Evidence Marker).
+
     
 # Features
 - Bullet casings as Evidence
