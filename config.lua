@@ -9,6 +9,9 @@ Config.PoliceCreatesEvidence = true
 ---------[ Enable or Disable Commands ]---------
 Config.Commands = true
 
+---------[ Enable or Disable Footprints ]---------
+Config.AllowFootprints = true
+
 ---------[ "qb" for qb-core Notify    or    "ox" for ox_lib Notify ]---------
 Config.Notify = "qb"
 
@@ -31,9 +34,14 @@ Config.AmmoLabels = {
     ['AMMO_SNIPER'] = 'Large caliber',
 }
 
-Config.EvidenceDelay = 200 -- in ms  //  Delay between each evidence drop (Higher number less evidence drops)
+Config.EvidenceDelay = {  -- in ms  //  Delay between each evidence drop (Higher number less evidence drops)
+    Evidence = 200,
+    Footprints = 2500
+}
+
 Config.TimerName = {
-    Evidence = true
+    Evidence = true,
+    Footprints = true
 }
 
 ---------[ These are the Events that can be added to ANY Client to make people drop Finger/Blood Drops. ]---------
