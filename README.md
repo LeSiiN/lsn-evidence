@@ -94,6 +94,10 @@ Add the following code to your app.js of your inventory (31.12.2023 Version  -> 
                 return `<p><strong>Evidence material: </strong><span>${itemData.info.label}</span></p>
                 <p><strong>Fingerprint: </strong><span>${itemData.info.fingerprint}</span></p>
                 <p><strong>Crime Scene: </strong><span>${itemData.info.street}</span></p><br /><p>${itemData.description}</p>`;
+            } else if (itemData.info.type == "footprint") {
+                return `<p><strong>Evidence material: </strong><span>${itemData.info.label}</span></p>
+                <p><strong>Shoe Number: </strong><span>${itemData.info.shoes}</span></p>
+                <p><strong>Crime Scene: </strong><span>${itemData.info.street}</span></p><br /><p>${itemData.description}</p>`;
             } else if (itemData.info.type == "dna") {
                 return `<p><strong>Evidence material: </strong><span>${itemData.info.label}</span></p>
                 <p><strong>DNA Code: </strong><span>${itemData.info.dnalabel}</span></p><br /><p>${itemData.description}</p>`;
@@ -180,6 +184,18 @@ Replace the following code to your app.js of your inventory
                     itemData.info.label +
                     "</span></p><p><strong>Fingerprint: </strong><span>" +
                     itemData.info.fingerprint +
+                    "</span></p><p><strong>Crime Scene: </strong><span>" +
+                    itemData.info.street +
+                    "</span></p><br /><p>" +
+                    itemData.description +
+                    "</p><p style=\"font-size:11px\"><b>Weight: </b>" + itemData.weight + " | <b>Amount: </b> " + itemData.amount + " | <b>Quality: </b> " + "<a style=\"font-size:11px;color:green\">" + Math.floor(itemData.info.quality) + "</a>"
+                );
+            } else if (itemData.info.type == "footprint") {
+                $(".item-info-description").html(
+                    "<p><strong>Evidence material: </strong><span>" +
+                    itemData.info.label +
+                    "</span></p><p><strong>Show Number: </strong><span>" +
+                    itemData.info.shoes +
                     "</span></p><p><strong>Crime Scene: </strong><span>" +
                     itemData.info.street +
                     "</span></p><br /><p>" +
