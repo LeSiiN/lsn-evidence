@@ -37,6 +37,7 @@ local Translations = {
         clear_fragments = 'Fjern fragmenter fra bil (Bare politi)',
         clear_crime_scene = 'Fjern ALLE bevis fra området (Bare politi)',
         clearblood = 'Fjern blod fra området (Bare politi)',
+        clearfootprint = 'Fjern området for fotspor (Bare politi)', 
         takedna = 'Ta en DNA -prøve fra en person (tom bevispose nødvendig) (Bare politi)',
     },
     progressbar = {

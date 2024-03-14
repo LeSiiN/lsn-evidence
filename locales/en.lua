@@ -37,6 +37,7 @@ local Translations = {
         clear_fragments = 'Clear Area of Vehicle Fragments (Police Only)',
         clear_crime_scene = 'Clear Area of all Evidence (Police Only)',
         clearblood = 'Clear The Area of Blood (Police Only)',
+        clearfootprint = 'Clear The Area of Footprints (Police Only)',
         takedna = 'Take a DNA sample from a person (empty evidence bag needed) (Police Only)',
     },
     progressbar = {
