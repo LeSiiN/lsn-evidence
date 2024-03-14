@@ -4,6 +4,7 @@ local Bullethole = {}
 local Fragments = {}
 local BloodDrops = {}
 local FingerDrops = {}
+local FootprintDrops = {}
 local QBCore = exports['qb-core']:GetCoreObject()
 local fingerprintsList = {}
 
@@ -14,7 +15,8 @@ local function CreateEvidenceId(type)
         finger = FingerDrops,
         casing = Casings,
         bullethole = Bullethole,
-        vehiclefragment = Fragments
+        vehiclefragment = Fragments,
+        footprint = FootprintDrops
     }
 
     if evidenceTable[type] then
@@ -507,6 +509,58 @@ RegisterNetEvent('evidence:server:AddFragmentToInventory', function(vehiclefragm
             TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['filled_evidence_bag'], 'add')
             TriggerClientEvent('evidence:client:RemoveVehicleFragment', -1, vehiclefragmentId)
             Fragments[vehiclefragmentId] = nil
+        end
+    end
+    else
+        if Config.Notify == "qb" then
+            TriggerClientEvent('QBCore:Notify', src, Lang:t('error.have_evidence_bag'), 'error')
+        elseif Config.Notify == "ox" then
+            TriggerClientEvent("ox_lib:notify", src, {title= "Evidence", description= Lang:t('error.have_evidence_bag'), type= 'error'})
+        else
+            print(Lang:t('error.config_error'))
+        end
+    end
+end)
+
+-----------------------------------------[ FOOTPRINTS ]-----------------------------------------
+RegisterNetEvent('evidence:server:CreateFootPrint', function(shoes, coords, currentTime)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    local footprintId = CreateEvidenceId("footprint")
+    TriggerClientEvent('evidence:client:AddFootPrint', -1, footprintId, shoes, coords, currentTime)
+end)
+
+RegisterNetEvent('evidence:server:ClearFootPrints', function(footprintList)
+    if footprintList and next(footprintList) then
+        for _, v in pairs(footprintList) do
+            TriggerClientEvent('evidence:client:RemoveFootPrint', -1, v)
+            FootprintDrops[v] = nil
+        end
+    end
+end)
+
+RegisterNetEvent('evidence:server:AddFootPrintToInventory', function(footprintId, footprintInfo)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    if Player.Functions.RemoveItem('empty_evidence_bag', 1) then
+        TriggerClientEvent('evidence:client:PlayerPickUpAnimation', src)
+        if Config.Inventory == "ox" then
+            local info = {}
+            info.label = footprintInfo.label
+            info.type = footprintInfo.type
+            info.street = footprintInfo.street
+            info.shoes = footprintInfo.shoes
+            info.shoes2 = footprintInfo.shoes2
+            if exports.ox_inventory:CanCarryItem(src, 'filled_evidence_bag', 1) then
+                exports.ox_inventory:AddItem(src, 'filled_evidence_bag', 1, info)
+            end
+            TriggerClientEvent('evidence:client:RemoveCasing', -1, footprintId)
+            FootprintDrops[footprintId] = nil
+        else
+        if Player.Functions.AddItem('filled_evidence_bag', 1, false, footprintInfo) then
+            TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items['filled_evidence_bag'], 'add')
+            TriggerClientEvent('evidence:client:RemoveCasing', -1, footprintId)
+            FootprintDrops[footprintId] = nil
         end
     end
     else
