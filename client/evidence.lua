@@ -18,6 +18,9 @@ local CurrentBullethole = nil
 local Fragments = {}
 local CurrentVehicleFragment = nil
 
+local Footprints = {}
+local CurrentFootprints = 0
+
 local currentTime = 0
 local r, g, b = 0, 0, 0
 
@@ -35,10 +38,36 @@ local WhitelistedWeapons = {
     `weapon_fireextinguisher`
 }
 
+local whitelistedMaleShoes = {
+    [33] = true, -- barefoot
+    [34] = true -- barefoot
+}
+
+local whitelistedFemaleShoes = {
+    [34] = true, -- barefoot
+    [35] = true -- barefoot
+}
+
 ------------------------------------------------------------------------------[ FUNCTIONS ]------------------------------------------------------------------------------
 local function WhitelistedWeapon(weapon)
     for i = 1, #WhitelistedWeapons do
         if WhitelistedWeapons[i] == weapon then
+            return true
+        end
+    end
+    return false
+end
+
+local function IsWearingWhitelistedShoes()
+    local ped = PlayerPedId()
+    local shoeIndex = GetPedDrawableVariation(ped, 6)
+    local model = GetEntityModel(ped)
+    if model == `mp_m_freemode_01` then
+        if whitelistedMaleShoes[shoeIndex] then
+            return true
+        end
+    else
+        if whitelistedFemaleShoes[shoeIndex] then
             return true
         end
     end
@@ -78,7 +107,7 @@ local function WaitTimer(name, action, ...)
     if not timer[name] then
         timer[name] = true
         action(...)
-        Wait(Config.EvidenceDelay)
+        Wait(Config.EvidenceDelay[name])
         timer[name] = false
     end
 end
@@ -105,6 +134,7 @@ AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
             bloodtype = 'Blood Type',
             fingerprint = 'Fingerprint',
             rgb = 'RGB',
+            shoes = 'Shoe Number',
         })
     end
 end)
@@ -397,11 +427,65 @@ RegisterNetEvent('evidence:client:ClearVehicleFragmentsInArea', function()
     end)
 end)
 
+-----------------------------------------[ FOOTPRINTS ]-----------------------------------------
+RegisterNetEvent('evidence:client:AddFootPrint', function(footprintId, shoes, coords, currentTime)
+    Footprints[footprintId] = {
+        shoes = shoes,
+        coords = {
+            x = coords.x,
+            y = coords.y,
+            z = coords.z - 0.9
+        },
+        time = currentTime
+    }
+end)
+
+RegisterNetEvent('evidence:client:RemoveFootPrint', function(footprintId)
+    Footprints[footprintId] = nil
+    CurrentFootprints = 0
+end)
+
+RegisterNetEvent('evidence:client:ClearFootprintInArea', function()
+    local pos = GetEntityCoords(PlayerPedId())
+    local footprintList = {}
+    QBCore.Functions.Progressbar('clear_casings', Lang:t('progressbar.bullet_casing'), 5000, false, true, {
+        disableMovement = false,
+        disableCarMovement = false,
+        disableMouse = false,
+        disableCombat = true
+    }, {}, {}, {}, function() -- Done
+        if Footprints and next(Footprints) then
+            for footprintId, _ in pairs(Footprints) do
+                if #(pos - vector3(Footprints[footprintId].coords.x, Footprints[footprintId].coords.y, Footprints[footprintId].coords.z)) <
+                    10.0 then
+                        footprintList[#footprintList + 1] = footprintId
+                end
+            end
+            if Config.Notify == "qb" then
+                QBCore.Functions.Notify(Lang:t('success.bullet_casing_removed'), 'success')
+            elseif Config.Notify == "ox" then
+                lib.notify({ title = 'Evidence', description = Lang:t('success.bullet_casing_removed'), duration = 5000, type = 'success' })
+            else
+                print(Lang:t('error.config_error'))
+            end
+            TriggerServerEvent('evidence:server:ClearFootPrints', footprintList)
+        end
+    end, function() -- Cancel
+        if Config.Notify == "qb" then
+            QBCore.Functions.Notify(Lang:t('error.bullet_casing_not_removed'), 'error')
+        elseif Config.Notify == "ox" then
+            lib.notify({ title = 'Evidence', description = Lang:t('error.bullet_casing_not_removed'), duration = 5000, type = 'error' })
+        else
+            print(Lang:t('error.config_error'))
+        end
+    end)
+end)
+
 -----------------------------------------[ EVENTS FOR COMMANDS/ITEMS ]-----------------------------------------
 
 local function ClearScene(progressDuration)
     local pos = GetEntityCoords(PlayerPedId())
-    local bulletholeList, casingList, blooddropList, fingerprintList, vehiclefragmentList = {}, {}, {}, {}, {}
+    local bulletholeList, casingList, blooddropList, fingerprintList, vehiclefragmentList, footprintList = {}, {}, {}, {}, {}, {}
 
     QBCore.Functions.Progressbar('clear_scene', Lang:t('progressbar.crime_scene'), progressDuration, false, true, {
         disableMovement = false,
@@ -430,6 +514,7 @@ local function ClearScene(progressDuration)
         removeEvidence(Blooddrops, "blood", 'ClearBlooddrops', blooddropList)
         removeEvidence(Fingerprints, "fingerprint", 'ClearFingerprints', fingerprintList)
         removeEvidence(Fragments, "vehiclefragment", 'ClearVehicleFragments', vehiclefragmentList)
+        removeEvidence(Footprints, "footprint", 'ClearFootPrints', footprintList)
 
         if Config.Notify == "qb" then
             QBCore.Functions.Notify(Lang:t('success.crime_scene_removed'), 'success')
@@ -481,6 +566,25 @@ AddEventHandler('CEventGunShot', function(witnesses, ped)
     end)
 end)
 
+if Config.AllowFootprints then
+    AddEventHandler('CEventFootStepHeard', function(witnesses, ped)
+        WaitTimer('Footprints', function()
+            if cache.ped ~= ped then return end
+            if PlayerJob.type == 'leo' and not Config.PoliceCreatesEvidence then return end
+
+            local speed = GetEntitySpeed(ped)
+            if speed > 6.5 then
+                local shoes = GetPedDrawableVariation(ped, 6)
+                if not IsWearingWhitelistedShoes() then
+                    currentTime = GetGameTimer()
+                    local coords = GetEntityCoords(ped)
+                    TriggerServerEvent('evidence:server:CreateFootPrint', shoes, coords, currentTime)
+                end
+            end
+        end)
+    end)
+end
+
 -----------------------------------------[ REMOVE EVIDENCE ]-----------------------------------------
 RegisterNetEvent('evidence:client:deleteEvidence', function()
     local RemoveEvidence = Config.RemoveEvidence * 60 * 1000
@@ -510,6 +614,8 @@ RegisterNetEvent('evidence:client:deleteEvidence', function()
     cleanupEvidence("Bullethole", Bullethole, 'evidence:server:ClearBullethole')
     
     cleanupEvidence("Fragments", Fragments, 'evidence:server:ClearVehicleFragments')
+
+    cleanupEvidence("Footprints", Footprints, 'evidence:server:ClearFootPrints')
 end)
 
 -----------------------------------------[ CHECK WITH FLASHLIGHT OR CAMERA ]-----------------------------------------
@@ -535,6 +641,7 @@ lib.onCache('weapon', function(value)
                                 ProcessMarkers(Casings, "casing")
                                 ProcessMarkers(Bullethole, "bullet")
                                 ProcessMarkers(Fragments, "vehiclefragment")
+                                ProcessMarkers(Footprints, "footprint")
                                 Wait(sleep)
                             else
                                 sleep = 500
@@ -554,9 +661,9 @@ function DrawMarkerIfInRange(v, type)
         blood = "blooddrops",
         fingerprint = "fingerprints",
         casing = "casings",
-        bullet = "bullethole"
+        bullet = "bullethole",
+        footprint = "footprint",
     }
-
     if textureDict[type] then
         while not HasStreamedTextureDictLoaded(textureDict[type]) do
             Wait(10)
@@ -631,6 +738,10 @@ if Config.PoliceJob == "hi-dev" then
                 info.serie = Lang:t('info.unknown')
                 info.serie2 = Fragments[key].serie
                 TriggerServerEvent('evidence:server:AddFragmentToInventory', key, info)
+            elseif type == "footprint" then
+                info.shoes = Lang:t('info.unknown')
+                info.shoes2 = Fragments[key].shoes
+                TriggerServerEvent('evidence:server:AddFootPrintToInventory', key, info)
             end
         end
     end
@@ -681,6 +792,9 @@ elseif Config.PoliceJob == "qb" then
                 info.ammotype = Fragments[key].type
                 info.serie = Fragments[key].serie
                 TriggerServerEvent('evidence:server:AddFragmentToInventory', key, info)
+            elseif type == "footprint" then
+                info.shoes = Footprints[key].shoes
+                TriggerServerEvent('evidence:server:AddFootPrintToInventory', key, info)
             end
         end
     end
