@@ -24,6 +24,7 @@ local Translations = {
         blood = 'Blood',
         vehiclefragment = 'Fragment',
         fingerprint = 'Fingerprint',
+        footprint = 'Footprint',
         player_id = 'ID of Player',
         unknown = 'Unknown',
     },
