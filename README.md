@@ -11,6 +11,7 @@
 - Fingerprint drops as Evidence
 - Bulletholes as Evidence
 - Vehicle Fragments as Evidence
+- Footprints as Evidence
 - DrawLine of the Shooting Position
 - Evidence can be checked via weapon_flashlight ( can be picked up )
 - Criminals can remove evidence
@@ -23,6 +24,7 @@
 - /clearholes - Clears nearby Bullet Holes drops.
 - /clearfragments - Clears nearby Vehicle Fragments drops.
 - /clearscene - Clears all nearby evidence drops.
+- /clearfootprints - Clears all nearby Footprints.
 - /takedna [id] - Takes a DNA sample from the player.
 
 # New Items
