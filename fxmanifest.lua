@@ -2,7 +2,7 @@ fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 description 'lsn-evidence a Evidence Script by LeSiiN'
-version '0.0.8'
+version '0.1.2'
 
 shared_scripts {
 	'config.lua',
