@@ -740,7 +740,7 @@ if Config.PoliceJob == "hi-dev" then
                 TriggerServerEvent('evidence:server:AddFragmentToInventory', key, info)
             elseif type == "footprint" then
                 info.shoes = Lang:t('info.unknown')
-                info.shoes2 = Fragments[key].shoes
+                info.shoes2 = Footprints[key].shoes
                 TriggerServerEvent('evidence:server:AddFootPrintToInventory', key, info)
             end
         end
