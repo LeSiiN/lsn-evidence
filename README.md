@@ -108,7 +108,7 @@ Add the following code to your app.js of your inventory (31.12.2023 Version  -> 
 
 </details>
 
-<details><summary> If you use ps/lj inventory or old qb inventory( From Nov 3 2023)</summary>
+<details><summary> If you use ps/lj inventory or old qb inventory with DEFAULT/hi-dev Policejob(From Nov 3 2023)</summary>
 
 lj line 559~
 ps line 560~
