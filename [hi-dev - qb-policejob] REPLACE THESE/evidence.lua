@@ -118,6 +118,15 @@ RegisterNetEvent('police:client:FindEvidenceBag', function()
             args = { type = 'vehiclefragment', label = 'Vehicle Fragment', icon = 'car' }
         }
     }
+    FindEvidence[#FindEvidence + 1] = {
+        opthead = Lang:t('evidence.examine_menu_shoes_h'),
+        optdesc = Lang:t('evidence.examine_menu_shoes_b'),
+        opticon = 'shoe',
+        optparams = {
+            event = 'police:client:SelectEvidence',
+            args = { type = 'footprint', label = 'Footprint', icon = 'shoe' }
+        }
+    }
     FindEvidence[#FindEvidence + 1] = { opthead = Lang:t('menu.close_x'), opticon = 'xmark', optparams = { event = '' } }
 
     local header = {
