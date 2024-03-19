@@ -381,6 +381,8 @@ examine_menu_bullet_h = "Ammunition fragment",
 examine_menu_bullet_b = "By examining the ammunition fragment you can determine the model and serial number of the weapon",
 examine_menu_frags_h = "Vehicle fragment",
 examine_menu_frags_b = "By examining the vehicle fragment you can determine the model and serial number of the vehicle",
+examine_menu_shoes_h = "Footprint",
+examine_menu_shoes_b = "By examining the footprint you can determine the Show Number",
 ```
 
 ## 💰 You can help me by Donating
