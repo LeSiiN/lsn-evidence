@@ -619,6 +619,7 @@ QBCore.Functions.CreateCallback('police:server:GetEvidenceByType', function(sour
                 elseif type == 'bullet' then if v.info.serie == Lang:t('info.unknown') then ItemList[#ItemList+1] = v end
                 elseif type == 'blood' then if v.info.dnalabel == Lang:t('info.unknown') then ItemList[#ItemList+1] = v end
                 elseif type == 'fingerprint' then if v.info.fingerprint == Lang:t('info.unknown') then ItemList[#ItemList+1] = v end
+                elseif type == 'footprint' then if v.info.shoes == Lang:t('info.unknown') then ItemList[#ItemList+1] = v end
                 end
             end
         end
@@ -630,6 +631,7 @@ QBCore.Functions.CreateCallback('police:server:GetEvidenceByType', function(sour
                 elseif type == 'bullet' then if v.metadata.serie == Lang:t('info.unknown') then ItemList[#ItemList+1] = v end
                 elseif type == 'blood' then if v.metadata.dnalabel == Lang:t('info.unknown') then ItemList[#ItemList+1] = v end
                 elseif type == 'fingerprint' then if v.metadata.fingerprint == Lang:t('info.unknown') then ItemList[#ItemList+1] = v end
+                elseif type == 'footprint' then if v.metadata.shoes == Lang:t('info.unknown') then ItemList[#ItemList+1] = v end
                 end
             end
         end
@@ -1252,6 +1254,8 @@ RegisterNetEvent('police:server:UpdateEvidenceBag', function(Item, Slot)
                 Item.info.bloodtype = Item.info.bloodtype2
             elseif Item.info.type == 'fingerprint' then
                 Item.info.fingerprint = Item.info.fingerprint2
+            elseif Item.info.type == 'footprint' then
+                Item.info.shoes = Item.info.shoes2
             end
             if Inventory.RemoveItem(source, 'filled_evidence_bag', 1, Slot) then
                 Inventory.AddItem(source, 'filled_evidence_bag', 1, Item.info, Slot)
@@ -1272,6 +1276,8 @@ RegisterNetEvent('police:server:UpdateEvidenceBag', function(Item, Slot)
                 Item.metadata.bloodtype = Item.metadata.bloodtype2
             elseif Item.metadata.type == 'fingerprint' then
                 Item.metadata.fingerprint = Item.metadata.fingerprint2
+            elseif Item.metadata.type == 'footprint' then
+                Item.metadata.shoes = Item.metadata.shoes2
             end
             if Inventory.RemoveItem(source, 'filled_evidence_bag', 1, Slot) then
                 Inventory.AddItem(source, 'filled_evidence_bag', 1, Item.metadata, Slot)
