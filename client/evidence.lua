@@ -79,6 +79,8 @@ local function DropBulletCasing(weapon, ped, currentTime)
     local randX = math.random() + math.random(-1, 1)
     local randY = math.random() + math.random(-1, 1)
     local coords = GetOffsetFromEntityInWorldCoords(ped, randX, randY, 0)
+    local retval, groundz = GetGroundZFor_3dCoord(coords.x, coords.y, coords.z - 0.9, true)
+    coords = vec3(coords.x, coords.y, groundz)
     TriggerServerEvent('evidence:server:CreateCasing', weapon, coords, currentTime)
     Wait(350)
 end
@@ -249,7 +251,7 @@ RegisterNetEvent('evidence:client:AddCasing', function(casingId, weapon, coords,
         coords = {
             x = coords.x,
             y = coords.y,
-            z = coords.z - 0.9
+            z = coords.z + 0.1
         },
         time = currentTime
     }
@@ -806,7 +808,7 @@ function ProcessMarkers(markers, type)
         local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
         if dist > 1.1 and dist < 20 then
             DrawMarkerIfInRange(v, type)
-        elseif dist < 1 then
+        elseif dist <= 1 then
             CheckInteraction(v, type, k)
         end
     end
