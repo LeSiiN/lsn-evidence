@@ -661,7 +661,7 @@ CreateThread(function()
     local ped = PlayerPedId()
     local sleep = 2500
     while true do
-        if IsEntityPlayingAnim(ped, "amb@world_human_paparazzi@male@base", "base",3) then
+        if IsEntityPlayingAnim(ped, "amb@world_human_paparazzi@male@base", "base",3) and QBCore.Functions.GetPlayerData().job.type == 'leo' then
             sleep = 5
             ProcessMarkers(Blooddrops, "blood")
             ProcessMarkers(Fingerprints, "fingerprint")
