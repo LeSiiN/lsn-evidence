@@ -657,6 +657,26 @@ lib.onCache('weapon', function(value)
     end
 end)
 
+CreateThread(function()
+    local ped = PlayerPedId()
+    local sleep = 2500
+    while true do
+        if IsEntityPlayingAnim(ped, "amb@world_human_paparazzi@male@base", "base",3) then
+            sleep = 5
+            ProcessMarkers(Blooddrops, "blood")
+            ProcessMarkers(Fingerprints, "fingerprint")
+            ProcessMarkers(Casings, "casing")
+            ProcessMarkers(Bullethole, "bullet")
+            ProcessMarkers(Fragments, "vehiclefragment")
+            ProcessMarkers(Footprints, "footprint")
+            Wait(sleep)
+        else
+            sleep = 2500
+            Wait(sleep)
+        end
+    end
+end)
+
 function DrawMarkerIfInRange(v, type)
     SetDrawOrigin(v.coords.x, v.coords.y, v.coords.z, 0)
     local textureDict = {
