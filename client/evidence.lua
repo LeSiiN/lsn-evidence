@@ -2,6 +2,8 @@
 PlayerJob = {}
 
 local QBCore = exports['qb-core']:GetCoreObject()
+local resourceState = GetResourceState('lsn-evidence')
+local ox_inventoryState = GetResourceState('ox_inventory')
 
 local Casings = {}
 local CurrentCasing = nil
@@ -79,8 +81,6 @@ local function DropBulletCasing(weapon, ped, currentTime)
     local randX = math.random() + math.random(-1, 1)
     local randY = math.random() + math.random(-1, 1)
     local coords = GetOffsetFromEntityInWorldCoords(ped, randX, randY, 0)
-    local retval, groundz = GetGroundZFor_3dCoord(coords.x, coords.y, coords.z - 0.9, true)
-    coords = vec3(coords.x, coords.y, groundz)
     TriggerServerEvent('evidence:server:CreateCasing', weapon, coords, currentTime)
     Wait(350)
 end
@@ -124,7 +124,8 @@ end)
 AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
     local player = QBCore.Functions.GetPlayerData()
     PlayerJob = player.job
-    if GetResourceState('ox_inventory'):match("start") then
+
+    if ox_inventoryState == 'started' then
         exports.ox_inventory:displayMetadata({
             label = 'Label',
             type = 'Type',
@@ -251,7 +252,7 @@ RegisterNetEvent('evidence:client:AddCasing', function(casingId, weapon, coords,
         coords = {
             x = coords.x,
             y = coords.y,
-            z = coords.z + 0.1
+            z = coords.z - 0.9
         },
         time = currentTime
     }
@@ -590,7 +591,7 @@ end
 -----------------------------------------[ REMOVE EVIDENCE ]-----------------------------------------
 RegisterNetEvent('evidence:client:deleteEvidence', function()
     local RemoveEvidence = Config.RemoveEvidence * 60 * 1000
-    local function cleanupEvidence(evidenceType, evidenceList, clearEvent)
+    local function cleanupEvidence(evidenceType, evidenceList)
         if evidenceList and next(evidenceList) then
             local evidenceToRemove = {}
             for k, v in pairs(evidenceList) do
@@ -598,26 +599,23 @@ RegisterNetEvent('evidence:client:deleteEvidence', function()
                 local timer = GetGameTimer()
                 local currentTimer = v.time + RemoveEvidence
                 if timer > v.time + RemoveEvidence and currentTimer ~= RemoveEvidence then
-                    evidenceToRemove[#evidenceToRemove + 1] = currentEvidence
+                    evidenceList[currentEvidence] = nil
                 end
-            end
-            if #evidenceToRemove > 0 then
-                TriggerServerEvent(clearEvent, evidenceToRemove)
             end
         end
     end
     
-    cleanupEvidence("Casings", Casings, 'evidence:server:ClearCasings')
+    cleanupEvidence("Casings", Casings)
     
-    cleanupEvidence("Blooddrops", Blooddrops, 'evidence:server:ClearBlooddrops')
+    cleanupEvidence("Blooddrops", Blooddrops)
     
-    cleanupEvidence("Fingerprints", Fingerprints, 'evidence:server:ClearFingerprints')
+    cleanupEvidence("Fingerprints", Fingerprints)
     
-    cleanupEvidence("Bullethole", Bullethole, 'evidence:server:ClearBullethole')
+    cleanupEvidence("Bullethole", Bullethole)
     
-    cleanupEvidence("Fragments", Fragments, 'evidence:server:ClearVehicleFragments')
+    cleanupEvidence("Fragments", Fragments)
 
-    cleanupEvidence("Footprints", Footprints, 'evidence:server:ClearFootPrints')
+    cleanupEvidence("Footprints", Footprints)
 end)
 
 -----------------------------------------[ CHECK WITH FLASHLIGHT OR CAMERA ]-----------------------------------------
@@ -661,7 +659,7 @@ CreateThread(function()
     local ped = PlayerPedId()
     local sleep = 2500
     while true do
-        if IsEntityPlayingAnim(ped, "amb@world_human_paparazzi@male@base", "base",3) and QBCore.Functions.GetPlayerData().job.type == 'leo' then
+        if IsEntityPlayingAnim(ped, "amb@world_human_paparazzi@male@base", "base",3) then
             sleep = 5
             ProcessMarkers(Blooddrops, "blood")
             ProcessMarkers(Fingerprints, "fingerprint")
@@ -828,7 +826,7 @@ function ProcessMarkers(markers, type)
         local dist = #(pos - vector3(v.coords.x, v.coords.y, v.coords.z))
         if dist > 1.1 and dist < 20 then
             DrawMarkerIfInRange(v, type)
-        elseif dist <= 1 then
+        elseif dist < 1 then
             CheckInteraction(v, type, k)
         end
     end
