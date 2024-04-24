@@ -1,11 +1,14 @@
 ------------------------------------------------------------------------------[ VARIABLES ]------------------------------------------------------------------------------
+local QBCore = exports['qb-core']:GetCoreObject()
+local resourceState = GetResourceState('lsn-evidence')
+local ox_inventoryState = GetResourceState('ox_inventory')
+
 local Casings = {}
 local Bullethole = {}
 local Fragments = {}
 local BloodDrops = {}
 local FingerDrops = {}
 local FootprintDrops = {}
-local QBCore = exports['qb-core']:GetCoreObject()
 local fingerprintsList = {}
 
 ------------------------------------------------------------------------------[ FUNCTIONS ]------------------------------------------------------------------------------
@@ -24,9 +27,16 @@ local function CreateEvidenceId(type)
         while evidenceTable[type][evidenceId] do
             evidenceId = math.random(10000, 99999)
         end
+        evidenceTable[type][evidenceId] = {
+            serverTime = os.time()
+        }
         return evidenceId
     else
-        return math.random(10000, 99999)
+        local randomId = math.random(10000, 99999)
+        evidenceTable[type][randomId] = {
+            serverTime = os.time()
+        }
+        return randomId
     end
 end
 
@@ -208,15 +218,21 @@ end)
 ------------------------------------------------------------------------------[ EVENTS ]------------------------------------------------------------------------------
 
 -----------------------------------------[ BLOOD ]-----------------------------------------
+-- RegisterNetEvent('evidence:server:CreateBloodDrop', function(citizenid, bloodtype, coords)
+--     local bloodId = CreateEvidenceId("blood")
+--     BloodDrops[bloodId] = {
+--         dna = citizenid,
+--         bloodtype = bloodtype
+--     }
+--     TriggerClientEvent('evidence:client:AddBlooddrop', -1, bloodId, citizenid, bloodtype, coords)
+-- end)
+
 RegisterNetEvent('evidence:server:CreateBloodDrop', function(citizenid, bloodtype, coords)
     local bloodId = CreateEvidenceId("blood")
-    BloodDrops[bloodId] = {
-        dna = citizenid,
-        bloodtype = bloodtype
-    }
+    BloodDrops[bloodId].dna = citizenid
+    BloodDrops[bloodId].bloodtype = bloodtype
     TriggerClientEvent('evidence:client:AddBlooddrop', -1, bloodId, citizenid, bloodtype, coords)
 end)
-
 
 RegisterNetEvent('evidence:server:ClearBlooddrops', function(blooddropList)
     if blooddropList and next(blooddropList) then
@@ -232,7 +248,7 @@ RegisterNetEvent('evidence:server:AddBlooddropToInventory', function(bloodId, bl
     local Player = QBCore.Functions.GetPlayer(src)
     if Player.Functions.RemoveItem('empty_evidence_bag', 1) then
         TriggerClientEvent('evidence:client:PlayerPickUpAnimation', src)
-        if Config.Inventory == "ox" then
+        if ox_inventoryState == 'started' then
             local info = {}
             info.label = bloodInfo.label
             info.type = bloodInfo.type
@@ -269,7 +285,6 @@ RegisterNetEvent('evidence:server:CreateFingerDrop', function(coords)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     local fingerId = CreateEvidenceId("finger")
-    FingerDrops[fingerId] = Player.PlayerData.metadata['fingerprint']
     TriggerClientEvent('evidence:client:AddFingerPrint', -1, fingerId, Player.PlayerData.metadata['fingerprint'], coords)
 end)
 
@@ -287,7 +302,7 @@ RegisterNetEvent('evidence:server:AddFingerprintToInventory', function(fingerId,
     local Player = QBCore.Functions.GetPlayer(src)
     if Player.Functions.RemoveItem('empty_evidence_bag', 1) then
         TriggerClientEvent('evidence:client:PlayerPickUpAnimation', src)
-        if Config.Inventory == "ox" then
+        if ox_inventoryState == 'started' then
             local info = {}
             info.label = fingerInfo.label
             info.type = fingerInfo.type
@@ -324,7 +339,8 @@ RegisterNetEvent('evidence:server:CreateCasing', function(weapon, coords, curren
     local casingId = CreateEvidenceId("casing")
     local weaponInfo = QBCore.Shared.Weapons[weapon]
     local serieNumber = nil
-    if Config.Inventory == "ox" then
+
+    if ox_inventoryState == 'started' then
         weaponInfo = exports.ox_inventory:GetCurrentWeapon(src)
         if weaponInfo then
             if weaponInfo.metadata and weaponInfo.metadata ~= '' then
@@ -358,7 +374,7 @@ RegisterNetEvent('evidence:server:AddCasingToInventory', function(casingId, casi
     local Player = QBCore.Functions.GetPlayer(src)
     if Player.Functions.RemoveItem('empty_evidence_bag', 1) then
         TriggerClientEvent('evidence:client:PlayerPickUpAnimation', src)
-        if Config.Inventory == "ox" then
+        if ox_inventoryState == 'started' then
             local info = {}
             info.label = casingInfo.label
             info.type = casingInfo.type
@@ -398,7 +414,8 @@ RegisterNetEvent('evidence:server:CreateBullethole', function(weapon, raycastcoo
     local bulletholeId = CreateEvidenceId("bullethole")
     local weaponInfo = QBCore.Shared.Weapons[weapon]
     local serieNumber = nil
-    if Config.Inventory == "ox" then
+
+    if ox_inventoryState == 'started' then
         weaponInfo = exports.ox_inventory:GetCurrentWeapon(src)
         if weaponInfo then
             if weaponInfo.metadata and weaponInfo.metadata ~= '' then
@@ -432,7 +449,7 @@ RegisterNetEvent('evidence:server:AddBulletToInventory', function(bulletholeId, 
     local Player = QBCore.Functions.GetPlayer(src)
     if Player.Functions.RemoveItem('empty_evidence_bag', 1) then
         TriggerClientEvent('evidence:client:PlayerPickUpAnimation', src)
-        if Config.Inventory == "ox" then
+        if ox_inventoryState == 'started' then
             local info = {}
             info.label = bulletInfo.label
             info.type = bulletInfo.type
@@ -472,7 +489,8 @@ RegisterNetEvent('evidence:server:CreateVehicleFragment', function(weapon, rayca
     local fragmentId = CreateEvidenceId("vehiclefragment")
     local weaponInfo = QBCore.Shared.Weapons[weapon]
     local serieNumber = nil
-    if Config.Inventory == "ox" then
+
+    if ox_inventoryState == 'started' then
         weaponInfo = exports.ox_inventory:GetCurrentWeapon(src)
         if weaponInfo then
             if weaponInfo.metadata and weaponInfo.metadata ~= '' then
@@ -506,7 +524,7 @@ RegisterNetEvent('evidence:server:AddFragmentToInventory', function(vehiclefragm
     local Player = QBCore.Functions.GetPlayer(src)
     if Player.Functions.RemoveItem('empty_evidence_bag', 1) then
         TriggerClientEvent('evidence:client:PlayerPickUpAnimation', src)
-        if Config.Inventory == "ox" then
+        if ox_inventoryState == 'started' then
             local info = {}
             info.label = fragmentInfo.label
             info.type = fragmentInfo.type
@@ -562,7 +580,7 @@ RegisterNetEvent('evidence:server:AddFootPrintToInventory', function(footprintId
     local Player = QBCore.Functions.GetPlayer(src)
     if Player.Functions.RemoveItem('empty_evidence_bag', 1) then
         TriggerClientEvent('evidence:client:PlayerPickUpAnimation', src)
-        if Config.Inventory == "ox" then
+        if ox_inventoryState == 'started' then
             local info = {}
             info.label = footprintInfo.label
             info.type = footprintInfo.type
@@ -595,4 +613,20 @@ end)
 -----------------------------------------[ deleteEvidence Logic ]-----------------------------------------
 lib.cron.new('*/' ..Config.RemoveEvidence.. ' * * * *', function()
     TriggerClientEvent("evidence:client:deleteEvidence", -1)
+
+    local evidenceTable = {
+        blood = BloodDrops,
+        finger = FingerDrops,
+        casing = Casings,
+        bullethole = Bullethole,
+        vehiclefragment = Fragments,
+        footprint = FootprintDrops
+    }
+    for k, v in pairs(evidenceTable) do
+        for k2, v2 in pairs(v) do
+            if v2.serverTime + Config.RemoveEvidence * 60 < os.time() then
+                v[k2] = nil
+            end
+        end
+    end
 end)
