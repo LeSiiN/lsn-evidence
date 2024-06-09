@@ -11,6 +11,23 @@ local RepairPed = {}
 local LEOjobs = {}
 local AlcoholStats = {}
 
+
+function tprint (tbl, indent)
+	if not indent then indent = 0 end
+	for k, v in pairs(tbl) do
+	  formatting = string.rep("  ", indent) .. k .. ": "
+	  if type(v) == "table" then
+		print(formatting)
+		tprint(v, indent+1)
+	  elseif type(v) == 'boolean' then
+		print(formatting .. tostring(v))      
+	  else
+		print(formatting .. v)
+	  end
+	end
+end
+
+
 -- Functions
 local function UpdateBlips()
     local dutyPlayers = {}
@@ -667,6 +684,19 @@ QBCore.Functions.CreateCallback('police:server:GetEvidenceByType', function(sour
                 end
             end
         end
+	elseif Config.Inventory == 'new-qb-inventory' then
+		local EvidenceItems = exports['qb-inventory']:GetItemsByName(source, 'filled_evidence_bag')
+        for k,v in pairs(EvidenceItems) do
+            if v.info.type == type then
+                if type == 'casing' then if v.info.serie == Lang:t('info.unknown') then ItemList[#ItemList+1] = v end
+                elseif type == 'vehiclefragment' then if v.info.serie == Lang:t('info.unknown') then ItemList[#ItemList+1] = v end
+                elseif type == 'bullet' then if v.info.serie == Lang:t('info.unknown') then ItemList[#ItemList+1] = v end
+                elseif type == 'blood' then if v.info.dnalabel == Lang:t('info.unknown') then ItemList[#ItemList+1] = v end
+                elseif type == 'fingerprint' then if v.info.fingerprint == Lang:t('info.unknown') then ItemList[#ItemList+1] = v end
+                elseif type == 'footprint' then if v.info.shoes == Lang:t('info.unknown') then ItemList[#ItemList+1] = v end
+                end
+            end
+        end
     elseif Config.Inventory == 'ox_inventory' then
         for k,v in pairs(EvidenceBags) do
             if v.metadata.type == type then
@@ -680,6 +710,7 @@ QBCore.Functions.CreateCallback('police:server:GetEvidenceByType', function(sour
             end
         end
     end
+	tprint(ItemList)
     cb(ItemList)
 end)
 
@@ -855,7 +886,7 @@ RegisterNetEvent('police:server:CuffPlayer', function(position, id, item)
     local targetPed = GetPlayerPed(id)
     local playerCoords = GetEntityCoords(playerPed)
     local targetCoords = GetEntityCoords(targetPed)
-    if #(playerCoords - targetCoords) > 2.5 then DropPlayer(src, "Attempted exploit abuse") end
+    if #(playerCoords - targetCoords) > 10 then DropPlayer(src, "Attempted exploit abuse") end
 
     local Player = QBCore.Functions.GetPlayer(src)
     local CuffedPlayer = QBCore.Functions.GetPlayer(id)
@@ -873,7 +904,7 @@ RegisterNetEvent('police:server:CutCuffs', function(id, item)
     local targetPed = GetPlayerPed(id)
     local playerCoords = GetEntityCoords(playerPed)
     local targetCoords = GetEntityCoords(targetPed)
-    if #(playerCoords - targetCoords) > 2.5 then DropPlayer(src, "Attempted exploit abuse") end
+    if #(playerCoords - targetCoords) > 10 then DropPlayer(src, "Attempted exploit abuse") end
 
     local Player = QBCore.Functions.GetPlayer(src)
     local CuffedPlayer = QBCore.Functions.GetPlayer(id)
@@ -891,7 +922,7 @@ RegisterNetEvent('police:server:TiePlayer', function(playerId, isSoftcuff)
     local targetPed = GetPlayerPed(playerId)
     local playerCoords = GetEntityCoords(playerPed)
     local targetCoords = GetEntityCoords(targetPed)
-    if #(playerCoords - targetCoords) > 2.5 then return DropPlayer(src, "Attempted exploit abuse") end
+    if #(playerCoords - targetCoords) > 10 then return DropPlayer(src, "Attempted exploit abuse") end
 
     local Player = QBCore.Functions.GetPlayer(src)
     local TiedPlayer = QBCore.Functions.GetPlayer(playerId)
@@ -911,7 +942,7 @@ RegisterNetEvent('police:server:EscortPlayer', function(playerId)
     local targetPed = GetPlayerPed(playerId)
     local playerCoords = GetEntityCoords(playerPed)
     local targetCoords = GetEntityCoords(targetPed)
-    if #(playerCoords - targetCoords) > 2.5 then return DropPlayer(src, "Attempted exploit abuse") end
+    if #(playerCoords - targetCoords) > 10 then return DropPlayer(src, "Attempted exploit abuse") end
 
     local Player = QBCore.Functions.GetPlayer(source)
     local EscortPlayer = QBCore.Functions.GetPlayer(playerId)
@@ -931,7 +962,7 @@ RegisterNetEvent('police:server:KidnapPlayer', function(playerId)
     local targetPed = GetPlayerPed(playerId)
     local playerCoords = GetEntityCoords(playerPed)
     local targetCoords = GetEntityCoords(targetPed)
-    if #(playerCoords - targetCoords) > 2.5 then return DropPlayer(src, "Attempted exploit abuse") end
+    if #(playerCoords - targetCoords) > 10 then return DropPlayer(src, "Attempted exploit abuse") end
 
     local Player = QBCore.Functions.GetPlayer(source)
     local EscortPlayer = QBCore.Functions.GetPlayer(playerId)
@@ -951,7 +982,7 @@ RegisterNetEvent('police:server:SetPlayerOutVehicle', function(playerId)
     local targetPed = GetPlayerPed(playerId)
     local playerCoords = GetEntityCoords(playerPed)
     local targetCoords = GetEntityCoords(targetPed)
-    if #(playerCoords - targetCoords) > 2.5 then return DropPlayer(src, "Attempted exploit abuse") end
+    if #(playerCoords - targetCoords) > 10 then return DropPlayer(src, "Attempted exploit abuse") end
 
     local EscortPlayer = QBCore.Functions.GetPlayer(playerId)
     if not QBCore.Functions.GetPlayer(src) or not EscortPlayer then return end
@@ -969,7 +1000,7 @@ RegisterNetEvent('police:server:PutPlayerInVehicle', function(playerId)
     local targetPed = GetPlayerPed(playerId)
     local playerCoords = GetEntityCoords(playerPed)
     local targetCoords = GetEntityCoords(targetPed)
-    if #(playerCoords - targetCoords) > 2.5 then return DropPlayer(src, "Attempted exploit abuse") end
+    if #(playerCoords - targetCoords) > 10 then return DropPlayer(src, "Attempted exploit abuse") end
 
     local EscortPlayer = QBCore.Functions.GetPlayer(playerId)
     if not QBCore.Functions.GetPlayer(src) or not EscortPlayer then return end
@@ -988,7 +1019,7 @@ RegisterNetEvent('police:server:BillPlayer', function(playerId, price)
     local targetPed = GetPlayerPed(playerId)
     local playerCoords = GetEntityCoords(playerPed)
     local targetCoords = GetEntityCoords(targetPed)
-    if #(playerCoords - targetCoords) > 2.5 then return DropPlayer(src, "Attempted exploit abuse") end
+    if #(playerCoords - targetCoords) > 10 then return DropPlayer(src, "Attempted exploit abuse") end
 
     local Player = QBCore.Functions.GetPlayer(src)
     local OtherPlayer = QBCore.Functions.GetPlayer(playerId)
@@ -1005,7 +1036,7 @@ RegisterNetEvent('police:server:JailPlayer', function(playerId, time)
     local targetPed = GetPlayerPed(playerId)
     local playerCoords = GetEntityCoords(playerPed)
     local targetCoords = GetEntityCoords(targetPed)
-    if #(playerCoords - targetCoords) > 2.5 then return DropPlayer(src, "Attempted exploit abuse") end
+    if #(playerCoords - targetCoords) > 10 then return DropPlayer(src, "Attempted exploit abuse") end
 
     local Player = QBCore.Functions.GetPlayer(src)
     local OtherPlayer = QBCore.Functions.GetPlayer(playerId)
@@ -1076,7 +1107,7 @@ RegisterNetEvent('police:server:SearchPlayer', function(playerId)
     local targetPed = GetPlayerPed(playerId)
     local playerCoords = GetEntityCoords(playerPed)
     local targetCoords = GetEntityCoords(targetPed)
-    if #(playerCoords - targetCoords) > 2.5 then return DropPlayer(src, "Attempted exploit abuse") end
+    --if #(playerCoords - targetCoords) > 10 then return DropPlayer(src, "Attempted exploit abuse") end
 
     local SearchedPlayer = QBCore.Functions.GetPlayer(playerId)
     if not QBCore.Functions.GetPlayer(src) or not SearchedPlayer then return end
@@ -1091,7 +1122,7 @@ RegisterNetEvent('police:server:SeizeCash', function(playerId)
     local targetPed = GetPlayerPed(playerId)
     local playerCoords = GetEntityCoords(playerPed)
     local targetCoords = GetEntityCoords(targetPed)
-    if #(playerCoords - targetCoords) > 2.5 then return DropPlayer(src, "Attempted exploit abuse") end
+    if #(playerCoords - targetCoords) > 10 then return DropPlayer(src, "Attempted exploit abuse") end
 
     local Player = QBCore.Functions.GetPlayer(src)
     local SearchedPlayer = QBCore.Functions.GetPlayer(playerId)
@@ -1111,7 +1142,7 @@ RegisterNetEvent('police:server:SeizeDriverLicense', function(playerId)
     local targetPed = GetPlayerPed(playerId)
     local playerCoords = GetEntityCoords(playerPed)
     local targetCoords = GetEntityCoords(targetPed)
-    if #(playerCoords - targetCoords) > 2.5 then return DropPlayer(src, "Attempted exploit abuse") end
+    if #(playerCoords - targetCoords) > 10 then return DropPlayer(src, "Attempted exploit abuse") end
 
     local SearchedPlayer = QBCore.Functions.GetPlayer(playerId)
     if not QBCore.Functions.GetPlayer(src) or not SearchedPlayer then return end
@@ -1132,17 +1163,17 @@ RegisterNetEvent('police:server:RobPlayer', function(playerId)
     local targetPed = GetPlayerPed(playerId)
     local playerCoords = GetEntityCoords(playerPed)
     local targetCoords = GetEntityCoords(targetPed)
-    if #(playerCoords - targetCoords) > 2.5 then return DropPlayer(src, "Attempted exploit abuse") end
+    if #(playerCoords - targetCoords) > 10 then return DropPlayer(src, "Attempted exploit abuse") end
 
     local Player = QBCore.Functions.GetPlayer(src)
     local SearchedPlayer = QBCore.Functions.GetPlayer(playerId)
     if not Player or not SearchedPlayer then return end
 
     local money = SearchedPlayer.PlayerData.money["cash"]
-    Player.Functions.AddMoney("cash", money, "police-player-robbed")
-    SearchedPlayer.Functions.RemoveMoney("cash", money, "police-player-robbed")
-    TriggerClientEvent('QBCore:Notify', SearchedPlayer.PlayerData.source, Lang:t("info.cash_robbed", {money = money}))
-    TriggerClientEvent('QBCore:Notify', Player.PlayerData.source, Lang:t("info.stolen_money", {stolen = money}))
+    --Player.Functions.AddMoney("cash", money, "police-player-robbed")
+    --SearchedPlayer.Functions.RemoveMoney("cash", money, "police-player-robbed")
+    --TriggerClientEvent('QBCore:Notify', SearchedPlayer.PlayerData.source, Lang:t("info.cash_robbed", {money = money}))
+    --TriggerClientEvent('QBCore:Notify', Player.PlayerData.source, Lang:t("info.stolen_money", {stolen = money}))
 end)
 
 RegisterNetEvent('police:server:UpdateBlips', function()
@@ -1257,7 +1288,7 @@ RegisterNetEvent('police:server:SetTracker', function(targetId)
     local targetPed = GetPlayerPed(targetId)
     local playerCoords = GetEntityCoords(playerPed)
     local targetCoords = GetEntityCoords(targetPed)
-    if #(playerCoords - targetCoords) > 2.5 then return DropPlayer(src, "Attempted exploit abuse") end
+    if #(playerCoords - targetCoords) > 10 then return DropPlayer(src, "Attempted exploit abuse") end
 
     local Target = QBCore.Functions.GetPlayer(targetId)
     if not QBCore.Functions.GetPlayer(src) or not Target then return end
@@ -1331,6 +1362,28 @@ end)
 RegisterNetEvent('police:server:UpdateEvidenceBag', function(Item, Slot)
     if Item then
         if Config.Inventory == 'qb-inventory' or Config.Inventory == 'ps-inventory' then
+            if Item.info.type == 'casing' then
+                Item.info.serie = Item.info.serie2
+                Item.info.ammotype = Item.info.ammotype2
+            elseif Item.info.type == 'bullet' then
+                Item.info.serie = Item.info.serie2
+                Item.info.ammotype = Item.info.ammotype2
+            elseif Item.info.type == 'vehiclefragment' then
+                Item.info.serie = Item.info.serie2
+                Item.info.ammotype = Item.info.ammotype2
+                Item.info.rgb = Item.info.rgb2
+            elseif Item.info.type == 'blood' then
+                Item.info.dnalabel = Item.info.dnalabel2
+                Item.info.bloodtype = Item.info.bloodtype2
+            elseif Item.info.type == 'fingerprint' then
+                Item.info.fingerprint = Item.info.fingerprint2
+            elseif Item.info.type == 'footprint' then
+                Item.info.shoes = Item.info.shoes2
+            end
+            if Inventory.RemoveItem(source, 'filled_evidence_bag', 1, Slot) then
+                Inventory.AddItem(source, 'filled_evidence_bag', 1, Item.info, Slot)
+            end
+		elseif Config.Inventory == 'new-qb-inventory' then
             if Item.info.type == 'casing' then
                 Item.info.serie = Item.info.serie2
                 Item.info.ammotype = Item.info.ammotype2
