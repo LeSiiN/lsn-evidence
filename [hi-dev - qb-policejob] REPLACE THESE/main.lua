@@ -12,22 +12,6 @@ local LEOjobs = {}
 local AlcoholStats = {}
 
 
-function tprint (tbl, indent)
-	if not indent then indent = 0 end
-	for k, v in pairs(tbl) do
-	  formatting = string.rep("  ", indent) .. k .. ": "
-	  if type(v) == "table" then
-		print(formatting)
-		tprint(v, indent+1)
-	  elseif type(v) == 'boolean' then
-		print(formatting .. tostring(v))      
-	  else
-		print(formatting .. v)
-	  end
-	end
-end
-
-
 -- Functions
 local function UpdateBlips()
     local dutyPlayers = {}
@@ -1516,24 +1500,3 @@ AddEventHandler("playerDropped", function(reason)
 end)
 
 
---- Update Alerts
-
-if Config.EnableVersionCheck then
-    CreateThread( function()
-        local function checkVersion(err,responseText, headers)
-            local curVersion = GetResourceMetadata(GetCurrentResourceName(), "version")
-            local cv = string.gsub(curVersion, "%.", "")
-            local resp = string.gsub(responseText, "%.", "")
-            if tonumber(cv) ~= tonumber(resp) then
-                print("^1###############################")
-                print("^3qb-policejob ("..curVersion..") is outdated, should be: "..responseText.."^3please update it from your keymaster account!")
-                print("^1###############################")
-            elseif tonumber(cv) > tonumber(resp) then
-                print("^3You somehow skipped a few versions of qb-policejob or the git went offline, if it's still online i advise you to update ( or downgrade? )")
-            else
-                print("^2qb-policejob ("..curVersion..") is up to date, have fun!")
-            end
-        end
-        PerformHttpRequest("https://raw.githubusercontent.com/i-kulgu/qb-policejob/master/version", checkVersion, "GET")
-    end)
-end
