@@ -157,6 +157,18 @@ RegisterNetEvent('police:client:SelectEvidence', function(Data)
                         }
                     }
                 end
+			elseif Config.Inventory == 'new-qb-inventory' then
+                for _, n in pairs(List) do
+                    EvidenceBagsMenu[#EvidenceBagsMenu + 1] = {
+                        opthead = n.label,
+                        optdesc = Lang:t('info.select_for_examine_b', { street = n.info.street, label = n.info.label, slot = n.slot }),
+                        opticon = 'caret-right',
+                        optparams = {
+                            event = 'police:client:ExamineEvidenceBag',
+                            args = { Item = n, slot = n.slot, label = n.info.label }
+                        }
+                    }
+                end
             elseif Config.Inventory == 'ox_inventory' then
                 for _, n in pairs(List) do
                     EvidenceBagsMenu[#EvidenceBagsMenu + 1] = {
