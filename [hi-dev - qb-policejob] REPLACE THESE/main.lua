@@ -694,7 +694,6 @@ QBCore.Functions.CreateCallback('police:server:GetEvidenceByType', function(sour
             end
         end
     end
-	tprint(ItemList)
     cb(ItemList)
 end)
 
