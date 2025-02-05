@@ -1,5 +1,5 @@
 # lsn-evidence
-    This Script was made from the evidence Code from qb-policejob! Please follow the Installation!
+    This Script is Old!
 
 # To-Do
 - When near two Evidence Markers, only allow the player to pick up a single one (and display the 'E' interact prompt for only one Evidence Marker).
